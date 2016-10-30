@@ -18,7 +18,7 @@ public abstract class LianjiaWebUtil {
 
     static Logger logger = LoggerFactory.getLogger(LianjiaWebUtil.class);
 
-    static String baseurl = "http://gz.lianjia.com/ershoufang/";
+    static String cityIndexUrl = "http://${city}.lianjia.com/ershoufang/";
 
     static String firstPageAreasUrl = "http://gz.lianjia.com/ershoufang/${area}/";
     static String pageAreasUrl = "http://gz.lianjia.com/ershoufang/${area}/pg${pageNo}/";
@@ -72,7 +72,16 @@ public abstract class LianjiaWebUtil {
     static Pattern Pattern129 = Pattern.compile("");
 
 
-    public static int getAreaTotalPageNo(String area){
+    /**
+     * 二手房首页
+     * @param city
+     * @return
+     */
+    public static String getCityIndexUrl(String city){
+        return cityIndexUrl.replace("${city}",city);
+    }
+
+    public static int fetchAreaTotalPageNo(String area){
         String pageUrl = firstPageAreasUrl.replace("${area}", area);
         String result = Util.okhttpGet(pageUrl);
         Matcher matcher = totalPageNoInPageWebPattern.matcher(result);
@@ -294,17 +303,35 @@ public abstract class LianjiaWebUtil {
     }
 
 
+    /**
+     *生成各个城市的区域sql
+     * 上海需要特殊处理
+     */
+    static public void fetchArea(){
+        String city = "bj";
+        String name = "北京";
+        String cityId = "1";
+        String basesql = "insert into area ( `name`,`code`,`parentsId`) values ('${name}','${code}',${cityId});";
+        String cityIndexUr = getCityIndexUrl(city);
+        String result = Util.okhttpGet(cityIndexUr);
+        String reg = ">\\s+([^\\s<]*)\\s+<";
+        result = result.replaceAll(reg, ">$1<");
+        //System.out.println(result);
+        Pattern tempPattern = Pattern.compile("<div data-role=\"ershoufang\" ><div>(.*?)</div></div>");
+        Matcher matcher = tempPattern.matcher(result);
+        String tempResult = "";
+        if (matcher.find()) {
+            tempResult = matcher.group(1);
+        }
+        tempPattern = Pattern.compile("<a href=\"/ershoufang/(.*?)/\"  title=\""+name+"(.*?)在售二手房 \">");
+        matcher = tempPattern.matcher(tempResult);
+        while (matcher.find()) {
+            System.out.println(basesql.replace("${code}",matcher.group(1)).replace("${name}",matcher.group(2)).replace("${cityId}",cityId) );
+        }
+    }
+
+
     public static void main(String[] args) {
-
-        House house = genHouseObject("http://gz.lianjia.com/ershoufang/GZ0002000813.html");
-
-        String jsonString = JSONObject.toJSONString(house);
-
-        System.out.println(jsonString);
-//
-        //System.out.println(fetchAreaHouseUrls("tianhe",105));
-
-        //System.out.println(getAreaTotalPageNo("tianhe"));
 
 
 

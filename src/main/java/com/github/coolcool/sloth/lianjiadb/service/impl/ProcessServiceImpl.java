@@ -50,7 +50,7 @@ public  class ProcessServiceImpl implements ProcessService{
 			if(process.getFinished()>0){
 				continue;
 			}
-			int totalPageNo = LianjiaWebUtil.getAreaTotalPageNo(process.getArea());
+			int totalPageNo = LianjiaWebUtil.fetchAreaTotalPageNo(process.getArea());
 			logger.info(process.getArea()+" total pageno is "+totalPageNo);
 			if(totalPageNo==0){
 				continue;
