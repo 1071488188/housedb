@@ -27,7 +27,7 @@ public class TimeTask extends TimerTask {
     static boolean genProcessing = false;
 
     @Override
-    @Scheduled(cron="0/5 * *  * * ? ")   //每5秒执行一次
+    @Scheduled(cron="0/5 * * * * ? ")   //每5秒执行一次
     public void run() {
         if(!houseUrlsFetching){
             houseUrlsFetching = true;
@@ -41,8 +41,7 @@ public class TimeTask extends TimerTask {
         }
     }
 
-
-    @Scheduled(cron="0/5 * *  * * ? ")   //每5秒执行一次
+    @Scheduled(cron="0/5 * * * * ? ")   //每5秒执行一次
     public void fetching() {
         if(!houseDetailFetching){
             houseDetailFetching = true;
@@ -60,11 +59,11 @@ public class TimeTask extends TimerTask {
     /**
      * 生成任务
      */
-    @Scheduled(cron="0/60 * *  * * ? ")   //每5秒执行一次
+    @Scheduled(cron="0/15 * *  * * ? ")   //每15秒执行一次
     public void genProcess() {
         if(!genProcessing){
             genProcessing = true;
-            log.info("genProcessing...");
+            log.info("开始执行genProcessing...");
             try {
                 processService.genProcesses();
             }catch (Throwable t){

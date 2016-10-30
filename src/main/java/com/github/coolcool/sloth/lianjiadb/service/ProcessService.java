@@ -18,6 +18,9 @@ public interface ProcessService{
 
 	void fetchHouseDetail();
 
+	void checkChange();
+
+
 	Integer save(Process process);
 
 	Integer count();

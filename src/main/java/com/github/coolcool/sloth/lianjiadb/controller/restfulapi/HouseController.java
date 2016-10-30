@@ -1,8 +1,12 @@
 package com.github.coolcool.sloth.lianjiadb.controller.restfulapi;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import com.alibaba.fastjson.JSONObject;
+import com.github.coolcool.sloth.lianjiadb.common.Util;
+import com.github.coolcool.sloth.lianjiadb.mapper.AreaMapper;
+import com.github.coolcool.sloth.lianjiadb.model.Area;
 import com.github.coolcool.sloth.lianjiadb.model.House;
 import com.github.coolcool.sloth.lianjiadb.service.impl.support.LianjiaWebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +15,6 @@ import com.github.coolcool.sloth.lianjiadb.service.HouseService;
 import com.github.coolcool.sloth.lianjiadb.common.Page;
 import javax.annotation.Generated;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
-import javax.annotation.Generated;
 
 @Generated(
 	value = {
@@ -28,8 +31,46 @@ public class HouseController {
 	@Autowired
 	private HouseService houseService;
 
+	@Autowired
+	AreaMapper areaMapper;
+
 	@RequestMapping(value = "/test", method = RequestMethod.GET)
 	public String test() {
+
+		String city = "gz";
+		String cityId = "3";
+		List<Area> areas = areaMapper.listOneLevelChilden(3);
+
+		for (int i = 0; i < areas.size(); i++) {
+			Area area = areas.get(i);
+			String areaCode = area.getCode();
+			String areaId = area.getId()+"";
+
+			String basesql = "insert into area ( `name`,`code`,`parentsId`) values ('${name}','${code}',${cityId});";
+			String cityAreaIndexUr = LianjiaWebUtil.getCityAreaIndexUrl(city,areaCode);
+			String result = Util.okhttpGet(cityAreaIndexUr);
+			String reg = ">\\s+([^\\s<]*)\\s+<";
+			result = result.replaceAll(reg, ">$1<");
+			//System.out.println(result);
+			Pattern tempPattern = Pattern.compile("<div data-role=\"ershoufang\" ><div>(.*?)</div></div><!-- 地铁 -->");
+			Matcher matcher = tempPattern.matcher(result);
+			String tempResult = "";
+			if (matcher.find()) {
+				tempResult = matcher.group(1);
+			}
+			//System.out.println(tempResult);
+			tempPattern = Pattern.compile("<a href=\"/ershoufang/(.*?)/\" >(.*?)</a>");
+			matcher = tempPattern.matcher(tempResult);
+			while (matcher.find()) {
+				System.out.println(basesql.replace("${code}",matcher.group(1)).replace("${name}",matcher.group(2)).replace("${cityId}",areaId) );
+			}
+
+
+		}
+
+
+
+
 		return "success";
 	}
 

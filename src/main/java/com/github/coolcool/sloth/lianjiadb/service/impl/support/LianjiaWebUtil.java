@@ -342,10 +342,10 @@ public abstract class LianjiaWebUtil {
     public static void main(String[] args) {
 
         String city = "gz";
-        String area = "tianhe";
+        String area = "yuexiu";
         String cityId = "3";
-        String areaName = "天河";
-        String areaId = "47";
+        //String areaName = "天河";
+        String areaId = "48";
 
         String basesql = "insert into area ( `name`,`code`,`parentsId`) values ('${name}','${code}',${cityId});";
         String cityAreaIndexUr = getCityAreaIndexUrl(city,area);

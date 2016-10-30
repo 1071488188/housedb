@@ -49,7 +49,7 @@ public  class ProcessServiceImpl implements ProcessService{
 
 	@Override
 	public void fetchHouseUrls() {
-		List<Process> processes = processMapper.list();
+		List<Process> processes = processMapper.listUnFinished();
 		for (int i = 0; i < processes.size(); i++) {
 			Process process = processes.get(i);
 			if(process.getFinished()>0){
@@ -58,6 +58,10 @@ public  class ProcessServiceImpl implements ProcessService{
 			int totalPageNo = LianjiaWebUtil.fetchAreaTotalPageNo(process.getArea());
 			logger.info(process.getArea()+" total pageno is "+totalPageNo);
 			if(totalPageNo==0){
+				process.setPageNo(0);
+				process.setFinished(1);
+				process.setFinishtime(new Date());
+				this.update(process);
 				continue;
 			}
 
@@ -105,7 +109,7 @@ public  class ProcessServiceImpl implements ProcessService{
 		boolean stop = false;
 		while (true && !stop) {
 			Page<Houseindex> houseindexPage = houseindexService.page(pageNo, pageSize);
-			if(houseindexPage==null)
+			if(houseindexPage==null || houseindexPage.getResult().size()==0)
 				break;
 			List<Houseindex> houseindexList = houseindexPage.getResult();
 			if(houseindexList==null)
@@ -135,6 +139,11 @@ public  class ProcessServiceImpl implements ProcessService{
 				}
 			}
 		}
+
+	}
+
+	@Override
+	public void checkChange() {
 
 	}
 
@@ -183,12 +192,12 @@ public  class ProcessServiceImpl implements ProcessService{
 
 	@Override
 	public void genProcesses() {
-		List<Area> areas = areaService.listAll();
-		for (int i = 0; i < areas.size(); i++) {
-			Area area = areas.get(i);
-			//忽略非广州市的计划任务
-			if(area.getParentsId()!=3)
-				continue;
+
+		int cityId = 3; //广州
+
+		List<Area> childenAreas = areaService.listTwoLevelChilden(cityId);
+		for (int i = 0; i < childenAreas.size(); i++) {
+			Area area = childenAreas.get(i);
 			//判断今天是否已经存在计划任务
 			int count = countTodayProcessByAreaCode(area.getCode());
 			if(count>0)

@@ -55,6 +55,16 @@ public  class AreaServiceImpl implements AreaService{
 	}
 
 	@Override
+	public List<Area> listOneLevelChilden(int id) {
+		return areaMapper.listOneLevelChilden(id);
+	}
+
+	@Override
+	public List<Area> listTwoLevelChilden(int id) {
+		return areaMapper.listTwoLevelChilden(id);
+	}
+
+	@Override
 	public Page<Area> page(int pageNo, int pageSize) {
 		Page<Area> page = new Page<>();
         int start = (pageNo-1)*pageSize;

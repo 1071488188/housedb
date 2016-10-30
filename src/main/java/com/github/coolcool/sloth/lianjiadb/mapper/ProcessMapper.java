@@ -39,6 +39,9 @@ public interface ProcessMapper{
 	@Select("SELECT * FROM process LIMIT 50 ")
 	List<Process> list();
 
+	@Select("SELECT * FROM process where finished=0 LIMIT 50 ")
+	List<Process> listUnFinished();
+
 
 	@Select("SELECT * FROM process LIMIT #{start}, #{step}")
 	List<Process> page(@Param("start") int start, @Param("step") int step );

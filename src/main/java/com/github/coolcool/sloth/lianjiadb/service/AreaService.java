@@ -27,6 +27,10 @@ public interface AreaService {
 
 	List<Area> listAll();
 
+	List<Area> listOneLevelChilden(int id);
+
+	List<Area> listTwoLevelChilden(int id);
+
 	Page<Area> page(int pageNo, int pageSize);
 
 	Integer increment();
