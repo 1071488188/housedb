@@ -30,8 +30,8 @@ public interface ProcessMapper{
 	Integer updateByPrimaryKey(Process process);
 
 	@Insert({
-		"INSERT INTO process (id, area, pageNo, finished, finishtime)",
-		"VALUE (#{id}, #{area}, #{pageNo}, #{finished}, now()) ON DUPLICATE KEY UPDATE id=#{id}"
+		"INSERT INTO process (area, pageNo, finished, createtime)",
+		"VALUE (#{area}, #{pageNo}, #{finished}, now()) ON DUPLICATE KEY UPDATE area=#{area}"
 	})
 	Integer insert(Process process);
 
@@ -46,5 +46,9 @@ public interface ProcessMapper{
 
 	@Select("SELECT `AUTO_INCREMENT` as number FROM  INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'test' AND TABLE_NAME = 'process'")
 	Integer increment();
-	
+
+
+	@Select("SELECT COUNT(*) FROM process where area=#{area} and to_days(createtime) = to_days(now())")
+	Integer countTodayProcessByAreaCode(@Param("area") String areaCode);
+
 }

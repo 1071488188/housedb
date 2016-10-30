@@ -1,8 +1,10 @@
 package com.github.coolcool.sloth.lianjiadb.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.github.coolcool.sloth.lianjiadb.model.Area;
 import com.github.coolcool.sloth.lianjiadb.model.House;
 import com.github.coolcool.sloth.lianjiadb.model.Houseindex;
+import com.github.coolcool.sloth.lianjiadb.service.AreaService;
 import com.github.coolcool.sloth.lianjiadb.service.HouseService;
 import com.github.coolcool.sloth.lianjiadb.service.HouseindexService;
 import com.github.coolcool.sloth.lianjiadb.service.impl.support.LianjiaWebUtil;
@@ -31,6 +33,9 @@ public  class ProcessServiceImpl implements ProcessService{
 
 	Logger logger = LoggerFactory.getLogger(ProcessService.class);
 
+
+	@Autowired
+	private AreaService areaService;
 
 	@Autowired
 	private HouseService houseService;
@@ -175,5 +180,29 @@ public  class ProcessServiceImpl implements ProcessService{
 	public Integer increment(){
 		return processMapper.increment();
 	}
-	
+
+	@Override
+	public void genProcesses() {
+		List<Area> areas = areaService.listAll();
+		for (int i = 0; i < areas.size(); i++) {
+			Area area = areas.get(i);
+			//忽略非广州市的计划任务
+			if(area.getParentsId()!=3)
+				continue;
+			//判断今天是否已经存在计划任务
+			int count = countTodayProcessByAreaCode(area.getCode());
+			if(count>0)
+				continue;
+			Process process = new Process();
+			process.setArea(area.getCode());
+			save(process);
+			logger.info("add  process "+ JSONObject.toJSONString(process));
+		}
+	}
+
+	@Override
+	public int countTodayProcessByAreaCode(String areaCode) {
+		return processMapper.countTodayProcessByAreaCode(areaCode);
+	}
+
 }

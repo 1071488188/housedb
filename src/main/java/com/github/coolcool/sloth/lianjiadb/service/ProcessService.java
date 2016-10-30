@@ -33,4 +33,16 @@ public interface ProcessService{
 	Page<Process> page(int pageNo, int pageSize);
 
 	Integer increment();
+
+	/**
+	 * 生成每日执行任务
+	 */
+	void genProcesses();
+
+	/**
+	 * 计算城区区域下，今天的计划任务数量
+	 * @param areaCode
+	 * @return
+     */
+	int countTodayProcessByAreaCode(String areaCode);
 }

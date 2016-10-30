@@ -22,11 +22,11 @@ public class Process {
 	/**
 	   
 	 */
-	private Integer pageNo;
+	private Integer pageNo=0;
 	/**
 	   
 	 */
-	private Integer finished;
+	private Integer finished=0;
 	/**
 	   
 	 */
