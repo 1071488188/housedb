@@ -42,7 +42,7 @@ public class TimeTask extends TimerTask {
     }
 
 
-    //@Scheduled(cron="0/5 * *  * * ? ")   //每5秒执行一次
+    @Scheduled(cron="0/5 * *  * * ? ")   //每5秒执行一次
     public void fetching() {
         if(!houseDetailFetching){
             houseDetailFetching = true;

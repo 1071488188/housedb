@@ -19,6 +19,7 @@ public abstract class LianjiaWebUtil {
     static Logger logger = LoggerFactory.getLogger(LianjiaWebUtil.class);
 
     static String cityIndexUrl = "http://${city}.lianjia.com/ershoufang/";
+    static String cityAreaIndexUrl = "http://${city}.lianjia.com/ershoufang/${area}/";
 
     static String firstPageAreasUrl = "http://gz.lianjia.com/ershoufang/${area}/";
     static String pageAreasUrl = "http://gz.lianjia.com/ershoufang/${area}/pg${pageNo}/";
@@ -79,6 +80,10 @@ public abstract class LianjiaWebUtil {
      */
     public static String getCityIndexUrl(String city){
         return cityIndexUrl.replace("${city}",city);
+    }
+
+    public static String getCityAreaIndexUrl(String city, String area){
+        return cityAreaIndexUrl.replace("${city}",city).replace("${area}",area);
     }
 
     public static int fetchAreaTotalPageNo(String area){
@@ -331,9 +336,35 @@ public abstract class LianjiaWebUtil {
     }
 
 
+
+
+
     public static void main(String[] args) {
 
+        String city = "gz";
+        String area = "tianhe";
+        String cityId = "3";
+        String areaName = "天河";
+        String areaId = "47";
 
+        String basesql = "insert into area ( `name`,`code`,`parentsId`) values ('${name}','${code}',${cityId});";
+        String cityAreaIndexUr = getCityAreaIndexUrl(city,area);
+        String result = Util.okhttpGet(cityAreaIndexUr);
+        String reg = ">\\s+([^\\s<]*)\\s+<";
+        result = result.replaceAll(reg, ">$1<");
+        //System.out.println(result);
+        Pattern tempPattern = Pattern.compile("<div data-role=\"ershoufang\" ><div>(.*?)</div></div><!-- 地铁 -->");
+        Matcher matcher = tempPattern.matcher(result);
+        String tempResult = "";
+        if (matcher.find()) {
+            tempResult = matcher.group(1);
+        }
+        //System.out.println(tempResult);
+        tempPattern = Pattern.compile("<a href=\"/ershoufang/(.*?)/\" >(.*?)</a>");
+        matcher = tempPattern.matcher(tempResult);
+        while (matcher.find()) {
+            System.out.println(basesql.replace("${code}",matcher.group(1)).replace("${name}",matcher.group(2)).replace("${cityId}",areaId) );
+        }
 
     }
 
