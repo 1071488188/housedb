@@ -1,12 +1,9 @@
 package com.github.coolcool.sloth.lianjiadb.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.github.coolcool.sloth.lianjiadb.model.Area;
-import com.github.coolcool.sloth.lianjiadb.model.House;
-import com.github.coolcool.sloth.lianjiadb.model.Houseindex;
-import com.github.coolcool.sloth.lianjiadb.service.AreaService;
-import com.github.coolcool.sloth.lianjiadb.service.HouseService;
-import com.github.coolcool.sloth.lianjiadb.service.HouseindexService;
+import com.github.coolcool.sloth.lianjiadb.model.*;
+import com.github.coolcool.sloth.lianjiadb.model.Process;
+import com.github.coolcool.sloth.lianjiadb.service.*;
 import com.github.coolcool.sloth.lianjiadb.service.impl.support.LianjiaWebUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -15,8 +12,6 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.util.*;
 import com.github.coolcool.sloth.lianjiadb.mapper.ProcessMapper;
-import com.github.coolcool.sloth.lianjiadb.model.Process;
-import com.github.coolcool.sloth.lianjiadb.service.ProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.github.coolcool.sloth.lianjiadb.common.Page;
@@ -44,6 +39,9 @@ public  class ProcessServiceImpl implements ProcessService{
 
 	@Autowired
 	private HouseindexService houseindexService;
+
+	@Autowired
+	private HousepriceService housepriceService;
 
 	@Autowired
 	private ProcessMapper processMapper;
@@ -157,9 +155,21 @@ public  class ProcessServiceImpl implements ProcessService{
 
 			for (int i = 0; i < houseindices.size(); i++) {
 				Houseindex houseindex = houseindices.get(i);
-				BigDecimal bigDecimal = LianjiaWebUtil.fetchPrice(houseindex.getUrl());
-
+				BigDecimal nowprice = LianjiaWebUtil.fetchPrice(houseindex.getUrl());
+				Houseprice houseprice = housepriceService.getNewest(houseindex.getCode());
+				if(houseprice==null || houseprice.getPrice()!=nowprice.doubleValue()){
+					//save newest price
+					Houseprice tempHousePrice = new Houseprice(houseindex.getCode(), houseprice.getPrice());
+					housepriceService.save(tempHousePrice);
+					logger.info("saving newest price :"+ JSONObject.toJSONString(tempHousePrice));
+				}
 				houseindexService.setTodayChecked(houseindex.getCode());
+				logger.info("============");
+				try {
+					Thread.sleep(1000);
+				}catch (Throwable t){
+					t.printStackTrace();
+				}
 
 			}
 
