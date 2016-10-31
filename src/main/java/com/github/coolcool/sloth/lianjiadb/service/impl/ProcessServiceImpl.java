@@ -11,6 +11,8 @@ import com.github.coolcool.sloth.lianjiadb.service.impl.support.LianjiaWebUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.math.BigDecimal;
 import java.util.*;
 import com.github.coolcool.sloth.lianjiadb.mapper.ProcessMapper;
 import com.github.coolcool.sloth.lianjiadb.model.Process;
@@ -119,7 +121,7 @@ public  class ProcessServiceImpl implements ProcessService{
 				Houseindex h = houseindexList.get(i);
 				if(h.getStatus()>0)
 					continue;
-				House house = LianjiaWebUtil.genHouseObject(h.getUrl());
+				House house = LianjiaWebUtil.fetchAndGenHouseObject(h.getUrl());
 
 				if(StringUtils.isEmpty(house.getTitle())|| StringUtils.isBlank(house.getTitle())){
 					stop = true;
@@ -145,6 +147,24 @@ public  class ProcessServiceImpl implements ProcessService{
 	@Override
 	public void checkChange() {
 		//遍历house，检查价格变化
+		int start = 0 ;
+		int step = 300;
+
+		while (true) {
+			List<Houseindex> houseindices = houseindexService.pageTodayUnCheck(start, step);
+			if(houseindices==null || houseindices.size()==0)
+				break;
+
+			for (int i = 0; i < houseindices.size(); i++) {
+				Houseindex houseindex = houseindices.get(i);
+				BigDecimal bigDecimal = LianjiaWebUtil.fetchPrice(houseindex.getUrl());
+
+				houseindexService.setTodayChecked(houseindex.getCode());
+
+			}
+
+		}
+
 
 	}
 

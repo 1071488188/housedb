@@ -121,7 +121,25 @@ public abstract class LianjiaWebUtil {
         return urls;
     }
 
-    public static House genHouseObject(String houseUrl){
+
+    public static BigDecimal fetchPrice(String houseUrl){
+
+        BigDecimal bigDecimal = null;
+
+        String fangUrl = houseUrl;
+        String result = Util.okhttpGet(fangUrl);
+        //result = result.replace("\r","").replace("\n","").replaceAll(">(.*?)<","");
+        String reg = ">\\s+([^\\s<]*)\\s+<";
+        result = result.replaceAll(reg, ">$1<");
+        matcher = pricePattern.matcher(result);
+        if(matcher.find()) {
+            bigDecimal = new BigDecimal(matcher.group(1));
+        }
+        return bigDecimal;
+
+    }
+
+    public static House fetchAndGenHouseObject(String houseUrl) {
         House house = new House(houseUrl);
         String fangUrl = houseUrl;
         String result = Util.okhttpGet(fangUrl);

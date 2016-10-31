@@ -2,6 +2,7 @@ package com.github.coolcool.sloth.lianjiadb.service;
 import java.util.*;
 import com.github.coolcool.sloth.lianjiadb.model.Houseindex;
 import com.github.coolcool.sloth.lianjiadb.common.Page;
+
 import javax.annotation.Generated;
 
 @Generated(
@@ -28,6 +29,10 @@ public interface HouseindexService{
 	List<Houseindex> list();
 
 	Page<Houseindex> page(int pageNo, int pageSize);
+
+	List<Houseindex> pageTodayUnCheck(int start, int step);
+
+	void setTodayChecked(String code);
 
 	Integer increment();
 }

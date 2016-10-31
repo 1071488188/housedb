@@ -1,6 +1,7 @@
 package com.github.coolcool.sloth.lianjiadb.model;
 
 import javax.annotation.Generated;
+import java.util.Date;
 
 @Generated(
 	value = {
@@ -47,6 +48,8 @@ public class Houseindex {
 	 */
 	private java.util.Date updatetime;
 
+	private java.util.Date lastCheckDate;
+
 	public Long getId() {
 		return id;
 	}
@@ -88,5 +91,13 @@ public class Houseindex {
 
 	public void setUpdatetime(java.util.Date updatetime) {
 		this.updatetime = updatetime;
-	} 
+	}
+
+	public Date getLastCheckDate() {
+		return lastCheckDate;
+	}
+
+	public void setLastCheckDate(Date lastCheckDate) {
+		this.lastCheckDate = lastCheckDate;
+	}
 }

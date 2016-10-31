@@ -47,6 +47,13 @@ public interface HouseindexMapper{
 	@Select("SELECT * FROM houseindex where status=0 LIMIT #{start}, #{step}")
 	List<Houseindex> page(@Param("start") int start, @Param("step") int step);
 
+	@Select("SELECT * FROM houseindex where  (lastcheckdate is null or lastcheckdate < to_days(now()) )  LIMIT #{start}, #{step}")
+	List<Houseindex> pageTodayUnCheck(@Param("start") int start, @Param("step") int step);
+
+	@Update({
+			"UPDATE houseindex SET lastcheckdate = to_days(now()) where code = #{code}"
+	})
+	void setTodayChecked(@Param("code")String code);
 
 	@Select("SELECT `AUTO_INCREMENT` as number FROM  INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'test' AND TABLE_NAME = 'houseindex'")
 	Integer increment();

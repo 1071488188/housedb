@@ -72,6 +72,16 @@ public  class HouseindexServiceImpl implements HouseindexService{
 	}
 
 	@Override
+	public List<Houseindex> pageTodayUnCheck(int start, int step) {
+		return houseindexMapper.pageTodayUnCheck(start,step);
+	}
+
+	@Override
+	public void setTodayChecked(String code) {
+		houseindexMapper.setTodayChecked(code);
+	}
+
+	@Override
 	public Integer increment(){
 		return houseindexMapper.increment();
 	}
