@@ -144,6 +144,7 @@ public  class ProcessServiceImpl implements ProcessService{
 
 	@Override
 	public void checkChange() {
+		//遍历house，检查价格变化
 
 	}
 
