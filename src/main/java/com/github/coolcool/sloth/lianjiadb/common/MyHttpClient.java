@@ -22,7 +22,7 @@ public abstract class MyHttpClient {
         int r = 10;
         Random random = new Random();
         int result = random.nextInt(r);
-        if(result<5){
+        if(result<11){
             return get(url, "", 0, 0);
         }else{
             return getByHttpProxy(url,"182.84.98.173", 808);

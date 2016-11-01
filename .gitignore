@@ -10,3 +10,11 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+/src/main/resources/application.properties
+.idea/
+lianjiadb.iml
+mvn.sh
+src/main/java/com/github/coolcool/sloth/lianjiadb/Test.java
+src/main/java/com/github/coolcool/sloth/lianjiadb/mapper/HousepriceMapper.java
+src/main/java/com/github/coolcool/sloth/lianjiadb/model/Houseprice.java
+target/
