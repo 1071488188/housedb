@@ -37,11 +37,13 @@ public abstract class LianjiaWebUtil {
     static Pattern favCountPattern = Pattern.compile("id=\"favCount\" class=\"count\">([0-9]+)<");
     static Pattern cartCountPattern = Pattern.compile("id=\"cartCount\" class=\"count\">([0-9]+)<");
 
-    static Pattern pricePattern = Pattern.compile("span class=\"total\">([0-9]+)</span>");
-    static Pattern unitPricePattern = Pattern.compile("class=\"unitPriceValue\">([0-9]+)<");
+    static Pattern pricePattern = Pattern.compile("span class=\"total\">([0-9]+(.[0-9]?))</span>");
+    static Pattern unitPricePattern = Pattern.compile("class=\"unitPriceValue\">([0-9]+(.[0-9]?))<");
 
-    static Pattern firstPayPricePattern = Pattern.compile("首付([0-9]+)万");
-    static Pattern taxPricePattern = Pattern.compile("id=\"PanelTax\">([0-9]+\\.[0-8]+)<");
+    static Pattern firstPayPricePattern = Pattern.compile("首付([0-9]+(.[0-9]?))万");
+    static Pattern taxPricePattern = Pattern.compile("id=\"PanelTax\">([0-9]+(.[0-9]?))<");
+    static Pattern removedPattern = Pattern.compile("<span>已下架</span>");
+
     static Pattern roomMainAndSubInfoPattern = Pattern.compile("div class=\"room\"><div class=\"mainInfo\">(.*?)</div><div class=\"subInfo\">(.*?)</div></div>");
     static Pattern roomMainAndSubTypePattern = Pattern.compile("<div class=\"type\"><div class=\"mainInfo\" title=\".*?\">(.*?)</div><div class=\"subInfo\">(.*?)</div></div>");
     static Pattern areaMainAndSubInfoPattern = Pattern.compile("<div class=\"area\"><div class=\"mainInfo\">(.*?)</div><div class=\"subInfo\">(.*?)</div></div>");
@@ -123,9 +125,7 @@ public abstract class LianjiaWebUtil {
 
 
     public static BigDecimal fetchPrice(String houseUrl){
-
         BigDecimal bigDecimal = null;
-
         String fangUrl = houseUrl;
         String result = Util.okhttpGet(fangUrl);
         //result = result.replace("\r","").replace("\n","").replaceAll(">(.*?)<","");
@@ -136,8 +136,33 @@ public abstract class LianjiaWebUtil {
             bigDecimal = new BigDecimal(matcher.group(1));
         }
         return bigDecimal;
-
     }
+
+    public static String fetchHouseHtml(String houseUrl){
+        String result = Util.okhttpGet(houseUrl);
+        String reg = ">\\s+([^\\s<]*)\\s+<";
+        result = result.replaceAll(reg, ">$1<");
+        return result;
+    }
+
+    public static boolean fetchRemoved(String houseUrl){
+        String fangUrl = houseUrl;
+        return getRemoved(Util.okhttpGet(fangUrl));
+    }
+
+    public static boolean getRemoved(String houseHtml){
+        String result = houseHtml;
+        String reg = ">\\s+([^\\s<]*)\\s+<";
+        result = result.replaceAll(reg, ">$1<");
+        matcher = removedPattern.matcher(result);
+        if(matcher.find()) {
+            return true;
+        }
+        return false;
+    }
+
+
+
 
     public static House fetchAndGenHouseObject(String houseUrl) {
         House house = new House(houseUrl);

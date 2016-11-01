@@ -144,27 +144,45 @@ public  class ProcessServiceImpl implements ProcessService{
 
 	@Override
 	public void checkChange() {
-		//遍历house，检查价格变化
+		//遍历house，检查价格变化、下架
 		int start = 0 ;
 		int step = 300;
 
 		while (true) {
 			List<Houseindex> houseindices = houseindexService.pageTodayUnCheck(start, step);
+
+			logger.info("checking price ..."+houseindices.size());
+
 			if(houseindices==null || houseindices.size()==0)
 				break;
 
 			for (int i = 0; i < houseindices.size(); i++) {
 				Houseindex houseindex = houseindices.get(i);
+
+				String houseHtml = LianjiaWebUtil.fetchHouseHtml(houseindex.getUrl());
+
+				//判断是否下架
+				boolean remove = LianjiaWebUtil.getRemoved(houseHtml);
+				if(remove){
+					logger.info("house is removed, "+JSONObject.toJSONString(houseindex));
+					continue;
+				}
+
+				//判断价格变更
 				BigDecimal nowprice = LianjiaWebUtil.fetchPrice(houseindex.getUrl());
+				if(nowprice==null){
+					logger.info("nowprice is null, "+ JSONObject.toJSONString(houseindex));
+					continue;
+				}
+
 				Houseprice houseprice = housepriceService.getNewest(houseindex.getCode());
 				if(houseprice==null || houseprice.getPrice()!=nowprice.doubleValue()){
 					//save newest price
-					Houseprice tempHousePrice = new Houseprice(houseindex.getCode(), houseprice.getPrice());
+					Houseprice tempHousePrice = new Houseprice(houseindex.getCode(), nowprice.doubleValue());
 					housepriceService.save(tempHousePrice);
 					logger.info("saving newest price :"+ JSONObject.toJSONString(tempHousePrice));
 				}
 				houseindexService.setTodayChecked(houseindex.getCode());
-				logger.info("============");
 				try {
 					Thread.sleep(1000);
 				}catch (Throwable t){

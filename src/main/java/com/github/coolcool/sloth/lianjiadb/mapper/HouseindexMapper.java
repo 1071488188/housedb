@@ -51,7 +51,7 @@ public interface HouseindexMapper{
 	List<Houseindex> pageTodayUnCheck(@Param("start") int start, @Param("step") int step);
 
 	@Update({
-			"UPDATE houseindex SET lastcheckdate = to_days(now()) where code = #{code}"
+			"UPDATE houseindex SET lastcheckdate = now() where code = #{code}"
 	})
 	void setTodayChecked(@Param("code")String code);
 
