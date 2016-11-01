@@ -4,13 +4,15 @@ import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.*;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 
 public class Util {
     private static final Logger log = LoggerFactory.getLogger(Util.class);
 
     //okhttp
-    public static String okhttpGet(String url)  {
-        //OkHttpClient client = new OkHttpClient();
+    public static String okhttpGet2(String url)  {
+
         Request request = new Request.Builder()
                 .url(url)
                 .header("User-Agent", "OkHttp Headers.java")
@@ -33,7 +35,13 @@ public class Util {
         }
         return result;
     }
-    public static final OkHttpClient client = new OkHttpClient();
+    public static OkHttpClient client = new OkHttpClient();
+
+    public static void changeOKHttpClientProxy(String host, int port){
+        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port));
+        OkHttpClient.Builder builder = new OkHttpClient.Builder().proxy(proxy);
+        client = builder.build();
+    }
 
 
 

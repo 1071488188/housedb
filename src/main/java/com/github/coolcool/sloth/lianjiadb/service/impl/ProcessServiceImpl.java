@@ -133,7 +133,7 @@ public  class ProcessServiceImpl implements ProcessService{
 				houseindexService.update(h);
 				logger.info("saving house:"+ JSONObject.toJSONString(house));
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(2000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -157,6 +157,13 @@ public  class ProcessServiceImpl implements ProcessService{
 				break;
 
 			for (int i = 0; i < houseindices.size(); i++) {
+
+				try {
+					Thread.sleep(800);
+				}catch (Throwable t){
+					t.printStackTrace();
+				}
+
 				Houseindex houseindex = houseindices.get(i);
 
 				String houseHtml = LianjiaWebUtil.fetchHouseHtml(houseindex.getUrl());
@@ -165,11 +172,13 @@ public  class ProcessServiceImpl implements ProcessService{
 				boolean remove = LianjiaWebUtil.getRemoved(houseHtml);
 				if(remove){
 					logger.info("house is removed, "+JSONObject.toJSONString(houseindex));
+					houseindex.setStatus(-1); //已下架
+					houseindexService.update(houseindex);
 					continue;
 				}
 
 				//判断价格变更
-				BigDecimal nowprice = LianjiaWebUtil.fetchPrice(houseindex.getUrl());
+				BigDecimal nowprice = LianjiaWebUtil.getPrice(houseHtml);
 				if(nowprice==null){
 					logger.info("nowprice is null, "+ JSONObject.toJSONString(houseindex));
 					continue;
@@ -183,12 +192,6 @@ public  class ProcessServiceImpl implements ProcessService{
 					logger.info("saving newest price :"+ JSONObject.toJSONString(tempHousePrice));
 				}
 				houseindexService.setTodayChecked(houseindex.getCode());
-				try {
-					Thread.sleep(1000);
-				}catch (Throwable t){
-					t.printStackTrace();
-				}
-
 			}
 
 		}

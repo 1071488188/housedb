@@ -1,12 +1,17 @@
 package com.github.coolcool.sloth.lianjiadb.service.impl.support;
 
 import com.alibaba.fastjson.JSONObject;
+import com.github.coolcool.sloth.lianjiadb.common.MyHttpClient;
 import com.github.coolcool.sloth.lianjiadb.common.Util;
 import com.github.coolcool.sloth.lianjiadb.model.House;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.net.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,11 +42,11 @@ public abstract class LianjiaWebUtil {
     static Pattern favCountPattern = Pattern.compile("id=\"favCount\" class=\"count\">([0-9]+)<");
     static Pattern cartCountPattern = Pattern.compile("id=\"cartCount\" class=\"count\">([0-9]+)<");
 
-    static Pattern pricePattern = Pattern.compile("span class=\"total\">([0-9]+(.[0-9]?))</span>");
-    static Pattern unitPricePattern = Pattern.compile("class=\"unitPriceValue\">([0-9]+(.[0-9]?))<");
+    static Pattern pricePattern = Pattern.compile("span class=\"total\">(\\d+(\\.\\d+)?)</span>");
+    static Pattern unitPricePattern = Pattern.compile("class=\"unitPriceValue\">(\\d+(\\.\\d+)?)<");
 
-    static Pattern firstPayPricePattern = Pattern.compile("首付([0-9]+(.[0-9]?))万");
-    static Pattern taxPricePattern = Pattern.compile("id=\"PanelTax\">([0-9]+(.[0-9]?))<");
+    static Pattern firstPayPricePattern = Pattern.compile("首付(\\d+(\\.\\d+)?)万");
+    static Pattern taxPricePattern = Pattern.compile("id=\"PanelTax\">(\\d+(\\.\\d+)?)<");
     static Pattern removedPattern = Pattern.compile("<span>已下架</span>");
 
     static Pattern roomMainAndSubInfoPattern = Pattern.compile("div class=\"room\"><div class=\"mainInfo\">(.*?)</div><div class=\"subInfo\">(.*?)</div></div>");
@@ -90,7 +95,7 @@ public abstract class LianjiaWebUtil {
 
     public static int fetchAreaTotalPageNo(String area){
         String pageUrl = firstPageAreasUrl.replace("${area}", area);
-        String result = Util.okhttpGet(pageUrl);
+        String result = MyHttpClient.get(pageUrl);
         Matcher matcher = totalPageNoInPageWebPattern.matcher(result);
         while (matcher.find()) {
             return Integer.parseInt(matcher.group(1));
@@ -108,10 +113,10 @@ public abstract class LianjiaWebUtil {
             String result = "";
             if (pageNo == 1) {
                 pageUrl = firstPageAreasUrl.replace("${area}", area);
-                result = Util.okhttpGet(pageUrl);
+                result = MyHttpClient.get(pageUrl);
             } else {
                 pageUrl = pageAreasUrl.replace("${area}", area).replace("${pageNo}", pageNo + "");
-                result = Util.okhttpGet(pageUrl);
+                result = MyHttpClient.get(pageUrl);
             }
             Matcher matcher = houseUrlInPageWebPattern.matcher(result);
             while (matcher.find()) {
@@ -124,10 +129,9 @@ public abstract class LianjiaWebUtil {
     }
 
 
-    public static BigDecimal fetchPrice(String houseUrl){
+    public static BigDecimal getPrice(String houseHtml){
         BigDecimal bigDecimal = null;
-        String fangUrl = houseUrl;
-        String result = Util.okhttpGet(fangUrl);
+        String result = houseHtml;
         //result = result.replace("\r","").replace("\n","").replaceAll(">(.*?)<","");
         String reg = ">\\s+([^\\s<]*)\\s+<";
         result = result.replaceAll(reg, ">$1<");
@@ -138,8 +142,17 @@ public abstract class LianjiaWebUtil {
         return bigDecimal;
     }
 
+    public static BigDecimal fetchPrice(String houseUrl){
+        BigDecimal bigDecimal = null;
+        String fangUrl = houseUrl;
+        String result = MyHttpClient.get(fangUrl);
+        String reg = ">\\s+([^\\s<]*)\\s+<";
+        result = result.replaceAll(reg, ">$1<");
+        return getPrice(result);
+    }
+
     public static String fetchHouseHtml(String houseUrl){
-        String result = Util.okhttpGet(houseUrl);
+        String result = MyHttpClient.get(houseUrl);
         String reg = ">\\s+([^\\s<]*)\\s+<";
         result = result.replaceAll(reg, ">$1<");
         return result;
@@ -147,11 +160,12 @@ public abstract class LianjiaWebUtil {
 
     public static boolean fetchRemoved(String houseUrl){
         String fangUrl = houseUrl;
-        return getRemoved(Util.okhttpGet(fangUrl));
+        return getRemoved(MyHttpClient.get(fangUrl));
     }
 
     public static boolean getRemoved(String houseHtml){
         String result = houseHtml;
+
         String reg = ">\\s+([^\\s<]*)\\s+<";
         result = result.replaceAll(reg, ">$1<");
         matcher = removedPattern.matcher(result);
@@ -167,7 +181,7 @@ public abstract class LianjiaWebUtil {
     public static House fetchAndGenHouseObject(String houseUrl) {
         House house = new House(houseUrl);
         String fangUrl = houseUrl;
-        String result = Util.okhttpGet(fangUrl);
+        String result = MyHttpClient.get(fangUrl);
         //result = result.replace("\r","").replace("\n","").replaceAll(">(.*?)<","");
         String reg = ">\\s+([^\\s<]*)\\s+<";
         result = result.replaceAll(reg, ">$1<");
@@ -361,7 +375,7 @@ public abstract class LianjiaWebUtil {
         String cityId = "1";
         String basesql = "insert into area ( `name`,`code`,`parentsId`) values ('${name}','${code}',${cityId});";
         String cityIndexUr = getCityIndexUrl(city);
-        String result = Util.okhttpGet(cityIndexUr);
+        String result = MyHttpClient.get(cityIndexUr);
         String reg = ">\\s+([^\\s<]*)\\s+<";
         result = result.replaceAll(reg, ">$1<");
         //System.out.println(result);
@@ -382,34 +396,61 @@ public abstract class LianjiaWebUtil {
 
 
 
-    public static void main(String[] args) {
+//    public static void main(String[] args) {
+//
+//        String city = "gz";
+//        String area = "yuexiu";
+//        String cityId = "3";
+//        //String areaName = "天河";
+//        String areaId = "48";
+//
+//        String basesql = "insert into area ( `name`,`code`,`parentsId`) values ('${name}','${code}',${cityId});";
+//        String cityAreaIndexUr = getCityAreaIndexUrl(city,area);
+//        String result = Util.okhttpGet(cityAreaIndexUr);
+//        String reg = ">\\s+([^\\s<]*)\\s+<";
+//        result = result.replaceAll(reg, ">$1<");
+//        //System.out.println(result);
+//        Pattern tempPattern = Pattern.compile("<div data-role=\"ershoufang\" ><div>(.*?)</div></div><!-- 地铁 -->");
+//        Matcher matcher = tempPattern.matcher(result);
+//        String tempResult = "";
+//        if (matcher.find()) {
+//            tempResult = matcher.group(1);
+//        }
+//        //System.out.println(tempResult);
+//        tempPattern = Pattern.compile("<a href=\"/ershoufang/(.*?)/\" >(.*?)</a>");
+//        matcher = tempPattern.matcher(tempResult);
+//        while (matcher.find()) {
+//            System.out.println(basesql.replace("${code}",matcher.group(1)).replace("${name}",matcher.group(2)).replace("${cityId}",areaId) );
+//        }
+//
+//    }
 
-        String city = "gz";
-        String area = "yuexiu";
-        String cityId = "3";
-        //String areaName = "天河";
-        String areaId = "48";
 
-        String basesql = "insert into area ( `name`,`code`,`parentsId`) values ('${name}','${code}',${cityId});";
-        String cityAreaIndexUr = getCityAreaIndexUrl(city,area);
-        String result = Util.okhttpGet(cityAreaIndexUr);
-        String reg = ">\\s+([^\\s<]*)\\s+<";
-        result = result.replaceAll(reg, ">$1<");
-        //System.out.println(result);
-        Pattern tempPattern = Pattern.compile("<div data-role=\"ershoufang\" ><div>(.*?)</div></div><!-- 地铁 -->");
-        Matcher matcher = tempPattern.matcher(result);
-        String tempResult = "";
-        if (matcher.find()) {
-            tempResult = matcher.group(1);
-        }
-        //System.out.println(tempResult);
-        tempPattern = Pattern.compile("<a href=\"/ershoufang/(.*?)/\" >(.*?)</a>");
-        matcher = tempPattern.matcher(tempResult);
-        while (matcher.find()) {
-            System.out.println(basesql.replace("${code}",matcher.group(1)).replace("${name}",matcher.group(2)).replace("${cityId}",areaId) );
-        }
+    public static void main(String[] args) throws IOException {
+
+        String url ="http://gz.lianjia.com/ershoufang/";
+
+//        System.getProperties().setProperty("proxySet", "true");
+//        System.getProperties().setProperty("socksProxyHost", "109.228.175.39");
+//        System.getProperties().setProperty("socksProxyPort", "45554");
+//
+//        Util.changeOKHttpClientProxy("109.228.175.39", 45554);
+
+//        String result = Util.okhttpGet("http://1212.ip138.com/ic.asp");
+//        System.out.println(result);
+        //String result3 = Util.okhttpGet(url);
+        //System.out.println(result3);
+
+
+        ///////////////////////////////////////
+
+
 
     }
+
+
+
+
 
 
 }

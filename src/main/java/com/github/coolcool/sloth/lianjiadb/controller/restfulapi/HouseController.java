@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.github.coolcool.sloth.lianjiadb.common.MyHttpClient;
 import com.github.coolcool.sloth.lianjiadb.common.Util;
 import com.github.coolcool.sloth.lianjiadb.mapper.AreaMapper;
 import com.github.coolcool.sloth.lianjiadb.model.Area;
@@ -48,7 +49,7 @@ public class HouseController {
 
 			String basesql = "insert into area ( `name`,`code`,`parentsId`) values ('${name}','${code}',${cityId});";
 			String cityAreaIndexUr = LianjiaWebUtil.getCityAreaIndexUrl(city,areaCode);
-			String result = Util.okhttpGet(cityAreaIndexUr);
+			String result = MyHttpClient.get(cityAreaIndexUr);
 			String reg = ">\\s+([^\\s<]*)\\s+<";
 			result = result.replaceAll(reg, ">$1<");
 			//System.out.println(result);
