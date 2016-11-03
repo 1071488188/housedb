@@ -433,25 +433,11 @@ public abstract class LianjiaWebUtil {
         String url2 = "http://gz.lianjia.com/ershoufang/GZ0002180546.html";
         String url3 = "http://gz.lianjia.com/ershoufang/GZ0001565595.html";
 
-//        System.getProperties().setProperty("proxySet", "true");
-//        System.getProperties().setProperty("socksProxyHost", "109.228.175.39");
-//        System.getProperties().setProperty("socksProxyPort", "45554");
-//
-//        Util.changeOKHttpClientProxy("109.228.175.39", 45554);
 
-//        String result = Util.okhttpGet("http://1212.ip138.com/ic.asp");
-//        System.out.println(result);
-        //String result3 = Util.okhttpGet(url);
-        //System.out.println(result3);
 
 
         ///////////////////////////////////////
-        try {
-            String houseHtml = LianjiaWebUtil.fetchHouseHtml(url3);
-        }catch (Error t){
-            logger.info("dddddd");
-        }
-        logger.info("vvvv");
+
 
 
     }

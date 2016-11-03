@@ -93,7 +93,7 @@ public  class ProcessServiceImpl implements ProcessService{
 				this.update(process);
 				process.setPageNo(process.getPageNo()+1);
 				try {
-					Thread.sleep(2000);
+					Thread.sleep(1000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -159,7 +159,7 @@ public  class ProcessServiceImpl implements ProcessService{
 			for (int i = 0; i < houseindexList.size(); i++) {
 
 				try {
-					Thread.sleep(2000);
+					Thread.sleep(1000);
 				}catch (Throwable t){
 					t.printStackTrace();
 				}
@@ -171,6 +171,7 @@ public  class ProcessServiceImpl implements ProcessService{
 					logger.info("house is not found, "+JSONObject.toJSONString(houseindex));
 					houseindex.setStatus(-301); //已下架
 					houseindexService.update(houseindex);
+					houseindex.setLastCheckDate(new Date());
 					continue;
 				}
 
@@ -179,6 +180,7 @@ public  class ProcessServiceImpl implements ProcessService{
 				if(remove){
 					logger.info("house is removed, "+JSONObject.toJSONString(houseindex));
 					houseindex.setStatus(-1); //已下架
+					houseindex.setLastCheckDate(new Date());
 					houseindexService.update(houseindex);
 					continue;
 				}

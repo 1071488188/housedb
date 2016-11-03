@@ -1,5 +1,6 @@
 package com.github.coolcool.sloth.lianjiadb.timetask;
 
+import com.github.coolcool.sloth.lianjiadb.common.MyHttpClient;
 import com.github.coolcool.sloth.lianjiadb.service.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,7 @@ public class CheckChangingTimeTask extends TimerTask {
     @Override
     @Scheduled(cron="0/5 * * * * ? ")   //每5秒执行一次
     public void run() {
-        if(!running){
+        if(MyHttpClient.available && !running){
             running = true;
             log.info("开始执行 checkChanging ...");
             try {

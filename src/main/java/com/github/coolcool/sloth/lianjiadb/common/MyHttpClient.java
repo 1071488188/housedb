@@ -23,11 +23,40 @@ public abstract class MyHttpClient {
 
     public static int ALLOCATE_VALUE = 10;
 
+    public static  boolean available = false;
+
     public static List<HttpProxyConfig> allHttpProxyConfigs = new ArrayList<>();
+    public static List<HttpProxyConfig> availableHttpProxyConfigs = new ArrayList<>();
 
     static {
-        allHttpProxyConfigs.add(new HttpProxyConfig("",0,"",""));
-        allHttpProxyConfigs.add(new HttpProxyConfig("182.84.98.173",808,"te1101","te1101"));
+        allHttpProxyConfigs.add(new HttpProxyConfig(1,"",0,"",""));
+        allHttpProxyConfigs.add(new HttpProxyConfig(2,"182.84.98.173",808,"te1101","te1101"));
+    }
+    
+    public static void addAvailableHttpProxyConfig(HttpProxyConfig httpProxyConfig){
+        for (int i = 0; i < availableHttpProxyConfigs.size(); i++) {
+            HttpProxyConfig temp = availableHttpProxyConfigs.get(i);
+            if(temp.getId()==httpProxyConfig.getId())
+                return ;
+        }
+        available = true;
+        logger.info("set myhttpclient available....");
+        availableHttpProxyConfigs.add(httpProxyConfig);
+        logger.info("add availableHttpProxyConfigs :"+JSONObject.toJSONString(httpProxyConfig));
+    }
+
+    public static void removeAvailableHttpProxyConfig(HttpProxyConfig httpProxyConfig){
+        for (int i = 0; i < availableHttpProxyConfigs.size(); i++) {
+            HttpProxyConfig temp = availableHttpProxyConfigs.get(i);
+            if(temp.getId()==httpProxyConfig.getId()){
+                availableHttpProxyConfigs.remove(i);
+                logger.info("remove availableHttpProxyConfigs :"+JSONObject.toJSONString(httpProxyConfig));
+            }
+        }
+        if (availableHttpProxyConfigs.size()==0) {
+            available = false;
+            logger.info("set myhttpclient not available....");
+        }
     }
 
 
@@ -40,9 +69,9 @@ public abstract class MyHttpClient {
         HttpProxyConfig httpProxyConfig = null;
 
         Random random = new Random();
-        int index = random.nextInt(allHttpProxyConfigs.size());
-        for (int i = 0; i < allHttpProxyConfigs.size(); i++) {
-            HttpProxyConfig tempHttpProxyConfig = allHttpProxyConfigs.get(i);
+        int index = random.nextInt(availableHttpProxyConfigs.size());
+        for (int i = 0; i < availableHttpProxyConfigs.size(); i++) {
+            HttpProxyConfig tempHttpProxyConfig = availableHttpProxyConfigs.get(i);
             if(tempHttpProxyConfig.status==1){
                 httpProxyConfig = tempHttpProxyConfig;
                 index--;
@@ -132,6 +161,7 @@ public abstract class MyHttpClient {
 
 
     public static class HttpProxyConfig {
+        int id;
         String host;
         int port;
         String username;
@@ -139,13 +169,22 @@ public abstract class MyHttpClient {
         int status=0; //0:暂停使用；1:使用中
         int type = 0;//0:http proxy; 1:socket proxy
 
-        public HttpProxyConfig(String host, int port, String username, String password) {
+        public HttpProxyConfig(int id,String host, int port, String username, String password) {
+            this.id = id;
             this.host = host;
             this.port = port;
             this.username = username;
             this.password = password;
             this.status=1;
             this.type = 0;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
         }
 
         public String getHost() {
@@ -194,6 +233,19 @@ public abstract class MyHttpClient {
 
         public void setType(int type) {
             this.type = type;
+        }
+    }
+
+    public static void main(String[] args) {
+        String url ="http://gz.lianjia.com/ershoufang/";
+        String url2 = "http://gz.lianjia.com/ershoufang/GZ0002180546.html";
+        String url3 = "http://gz.lianjia.com/ershoufang/GZ0001565595.html";
+        HttpProxyConfig httpProxyConfig = new HttpProxyConfig(2,"182.84.98.173",808,"te1101","te1101");
+        String result = get(url2,httpProxyConfig);
+        if(result.indexOf("验证异常流量")<0){
+            logger.info("OK");
+        }else {
+            logger.info("er");
         }
     }
 
