@@ -193,11 +193,20 @@ public  class ProcessServiceImpl implements ProcessService{
 				}
 
 				Houseprice houseprice = housepriceService.getNewest(houseindex.getCode());
-				if(houseprice==null || houseprice.getPrice()!=nowprice.doubleValue()){
+				if(houseprice==null){
 					//save newest price
 					Houseprice tempHousePrice = new Houseprice(houseindex.getCode(), nowprice.doubleValue());
 					housepriceService.save(tempHousePrice);
 					logger.info("saving newest price :"+ JSONObject.toJSONString(tempHousePrice));
+				}else if(houseprice.getPrice()!=nowprice.doubleValue()){
+					//save price change
+					boolean up = true;
+					if(houseprice.getPrice()>nowprice.doubleValue()){
+						up = false;
+					}
+					Houseprice tempHousePrice = new Houseprice(houseindex.getCode(), nowprice.doubleValue());
+					housepriceService.save(tempHousePrice);
+					logger.info("changing newest price "+(up?"up:":"down:")+JSONObject.toJSONString(tempHousePrice));
 				}else{
 					logger.info("price is the same,"+JSONObject.toJSONString(houseprice));
 				}
