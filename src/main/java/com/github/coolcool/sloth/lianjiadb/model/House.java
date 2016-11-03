@@ -1,5 +1,8 @@
 package com.github.coolcool.sloth.lianjiadb.model;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.annotation.Generated;
 
 @Generated(
@@ -107,7 +110,7 @@ public class House {
 	 */
 	private String tags;
 	/**
-	   
+
 	 */
 	private String decoratingDesc;
 	/**
@@ -235,6 +238,7 @@ public class House {
 	 */
 	private String transactionContent10;
 
+	@JSONField(serialize=false)
 	private  String html;
 
 

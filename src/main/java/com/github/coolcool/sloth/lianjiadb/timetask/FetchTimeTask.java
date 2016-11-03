@@ -13,11 +13,9 @@ import java.util.TimerTask;
 
 @EnableScheduling
 @Service
-public class TimeTask extends TimerTask {
+public class FetchTimeTask extends TimerTask {
 
-    private static final Logger log = LoggerFactory.getLogger(TimeTask.class);
-
-
+    private static final Logger log = LoggerFactory.getLogger(FetchTimeTask.class);
 
     @Autowired
     private ProcessService processService;
@@ -26,8 +24,30 @@ public class TimeTask extends TimerTask {
     static boolean houseDetailFetching = false;
     static boolean genProcessing = false;
 
+
+    /**
+     * 生成当天任务
+     */
+    //@Scheduled(cron="0/15 * *  * * ? ")   //每15秒执行一次
+    public void genProcess() {
+        if(!genProcessing){
+            genProcessing = true;
+            log.info("开始执行genProcessing...");
+            try {
+                processService.genProcesses();
+            }catch (Throwable t){
+                t.printStackTrace();
+            }
+            genProcessing = false;
+        }
+    }
+
+
+    /**
+     * 根据当天的执行任务，按最小区域（车陂、华景）分页获取房屋链接地址，入库 houseindex
+     */
     @Override
-    @Scheduled(cron="0/5 * * * * ? ")   //每5秒执行一次
+    //@Scheduled(cron="0/5 * * * * ? ")   //每5秒执行一次
     public void run() {
         if(!houseUrlsFetching){
             houseUrlsFetching = true;
@@ -41,7 +61,7 @@ public class TimeTask extends TimerTask {
         }
     }
 
-    @Scheduled(cron="0/5 * * * * ? ")   //每5秒执行一次
+    //@Scheduled(cron="0/5 * * * * ? ")   //每5秒执行一次
     public void fetching() {
         if(!houseDetailFetching){
             houseDetailFetching = true;
@@ -52,24 +72,6 @@ public class TimeTask extends TimerTask {
                 t.printStackTrace();
             }
             houseDetailFetching = false;
-        }
-    }
-
-
-    /**
-     * 生成任务
-     */
-    @Scheduled(cron="0/15 * *  * * ? ")   //每15秒执行一次
-    public void genProcess() {
-        if(!genProcessing){
-            genProcessing = true;
-            log.info("开始执行genProcessing...");
-            try {
-                processService.genProcesses();
-            }catch (Throwable t){
-                t.printStackTrace();
-            }
-            genProcessing = false;
         }
     }
     

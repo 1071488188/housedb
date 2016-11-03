@@ -25,7 +25,7 @@ public class CheckChangingTimeTask extends TimerTask {
     static boolean running = false;
 
     @Override
-    @Scheduled(cron="0/5 * * * * ? ")   //每15秒执行一次
+    @Scheduled(cron="0/5 * * * * ? ")   //每5秒执行一次
     public void run() {
         if(!running){
             running = true;

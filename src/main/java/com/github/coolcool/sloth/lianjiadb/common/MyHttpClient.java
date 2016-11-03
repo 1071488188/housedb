@@ -1,5 +1,8 @@
 package com.github.coolcool.sloth.lianjiadb.common;
 
+import com.alibaba.fastjson.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import java.io.BufferedReader;
@@ -7,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -14,40 +19,72 @@ import java.util.Random;
  */
 public abstract class MyHttpClient {
 
+    static Logger logger = LoggerFactory.getLogger(MyHttpClient.class);
+
+    public static int ALLOCATE_VALUE = 10;
+
+    public static List<HttpProxyConfig> allHttpProxyConfigs = new ArrayList<>();
+
+    static {
+        allHttpProxyConfigs.add(new HttpProxyConfig("",0,"",""));
+        allHttpProxyConfigs.add(new HttpProxyConfig("182.84.98.173",808,"te1101","te1101"));
+    }
+
+
     public static String get(String url){
         return getByRandomProxy(url);
     }
 
     public static String getByRandomProxy(String url){
-        int r = 10;
+
+        HttpProxyConfig httpProxyConfig = null;
+
         Random random = new Random();
-        int result = random.nextInt(r);
-        if(result<11){
-            return get(url, "", 0, 0);
-        }else{
-            return getByHttpProxy(url,"182.84.98.173", 808);
+        int index = random.nextInt(allHttpProxyConfigs.size());
+        for (int i = 0; i < allHttpProxyConfigs.size(); i++) {
+            HttpProxyConfig tempHttpProxyConfig = allHttpProxyConfigs.get(i);
+            if(tempHttpProxyConfig.status==1){
+                httpProxyConfig = tempHttpProxyConfig;
+                index--;
+                if(index<0){
+                    break;
+                }
+            }
         }
+
+        if(httpProxyConfig==null){
+            logger.warn("no available httpProxyConfig！");
+            try {
+                Thread.sleep(60*1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return "";
+        }
+        //logger.info("find http proxy :" + JSONObject.toJSONString(httpProxyConfig));
+        return get(url, httpProxyConfig);
+
 
     }
 
 
-    public static String get(String url, String proxyHost, int proxyPort, int type){
+    public static String get(String url, HttpProxyConfig httpProxyConfig){
         StringBuilder sb = new StringBuilder();
         Proxy proxy = null;
         // /创建代理服务器
-        if(!StringUtils.isEmpty(proxyHost)) {
-            InetSocketAddress addr = new InetSocketAddress(proxyHost, proxyPort);
-            if (type == 1)
+        if(!StringUtils.isEmpty(httpProxyConfig.getHost())) {
+            InetSocketAddress addr = new InetSocketAddress(httpProxyConfig.getHost(), httpProxyConfig.getPort());
+            if (httpProxyConfig.getType() == 1)
                 proxy = new Proxy(Proxy.Type.SOCKS, addr); // Socket 代理
             else
                 proxy = new Proxy(Proxy.Type.HTTP, addr); // http 代理
-            Authenticator.setDefault(new MyAuthenticator("te1101", "te1101"));// 设置代理的用户和密码
+            Authenticator.setDefault(new MyAuthenticator(httpProxyConfig.getUsername(), httpProxyConfig.getPassword()));// 设置代理的用户和密码
         }
         HttpURLConnection connection = null;// 设置代理访问
         InputStream is = null;
         try {
             URL tempUrl = new URL(url);
-            if(StringUtils.isEmpty(proxyHost)){
+            if(StringUtils.isEmpty(httpProxyConfig.getHost())){
                 connection = (HttpURLConnection) tempUrl.openConnection();
             }else {
                 connection = (HttpURLConnection) tempUrl.openConnection(proxy);
@@ -61,13 +98,14 @@ public abstract class MyHttpClient {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            return "error";
         }finally {
             if(is != null){
                 try {
                     is.close();
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
+                    return "error";
                 }
             }
             if(connection != null){
@@ -76,19 +114,6 @@ public abstract class MyHttpClient {
         }
         return sb.toString();
     }
-
-
-    public static String getBySocketProxy(String url, String proxyHost, int proxyPort){
-        return get(url, proxyHost, proxyPort, 1);
-    }
-
-    public static String getByHttpProxy(String url, String proxyHost, int proxyPort){
-        return get(url, proxyHost, proxyPort, 0);
-    }
-
-
-
-
 
 
     static class MyAuthenticator extends Authenticator {
@@ -102,6 +127,73 @@ public abstract class MyHttpClient {
 
         protected PasswordAuthentication getPasswordAuthentication() {
             return new PasswordAuthentication(user, password.toCharArray());
+        }
+    }
+
+
+    public static class HttpProxyConfig {
+        String host;
+        int port;
+        String username;
+        String password;
+        int status=0; //0:暂停使用；1:使用中
+        int type = 0;//0:http proxy; 1:socket proxy
+
+        public HttpProxyConfig(String host, int port, String username, String password) {
+            this.host = host;
+            this.port = port;
+            this.username = username;
+            this.password = password;
+            this.status=1;
+            this.type = 0;
+        }
+
+        public String getHost() {
+            return host;
+        }
+
+        public void setHost(String host) {
+            this.host = host;
+        }
+
+        public int getPort() {
+            return port;
+        }
+
+        public void setPort(int port) {
+            this.port = port;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        public int getStatus() {
+            return status;
+        }
+
+        public void setStatus(int status) {
+            this.status = status;
+        }
+
+        public int getType() {
+            return type;
+        }
+
+        public void setType(int type) {
+            this.type = type;
         }
     }
 

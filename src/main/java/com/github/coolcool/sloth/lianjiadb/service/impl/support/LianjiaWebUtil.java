@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
@@ -57,7 +58,7 @@ public abstract class LianjiaWebUtil {
     static Pattern areaNameHtmlPattern_1 = Pattern.compile("<a.*?>(.*?)</a>");
     static Pattern schoolNamePattern = Pattern.compile("<div class=\"schoolName\"><i class=\"icon\"></i><span class=\"label\">对口学校</span><span class=\"info\"><a.*?>(.*?)<");
     static Pattern baseContentPattern = Pattern.compile("<div class=\"base\"><div class=\"name\">基本属性</div><div class=\"content\"><ul><li><span class=\"label\">房屋户型</span>(.*?)</li><li><span class=\"label\">所在楼层</span>(.*?)</li><li><span class=\"label\">建筑面积</span>(.*?)</li><li><span class=\"label\">户型结构</span>(.*?)</li><li><span class=\"label\">套内面积</span>(.*?)</li><li><span class=\"label\">建筑类型</span>(.*?)</li><li><span class=\"label\">房屋朝向</span>(.*?)</li><li><span class=\"label\">建筑结构</span>(.*?)</li><li><span class=\"label\">装修情况</span>(.*?)</li><li><span class=\"label\">梯户比例</span>(.*?)</li><li><span class=\"label\">供暖方式</span>(.*?)</li><li><span class=\"label\">配备电梯</span>(.*?)</li></ul></div></div>");
-    static Pattern transactionContentPattern = Pattern.compile("<div class=\"transaction\"><div class=\"name\">交易属性</div><div class=\"content\"><ul><li><span class=\"label\">挂牌时间</span>(.*?)</li><li><span class=\"label\">交易权属</span>(.*?)</li><li><span class=\"label\">上次交易</span>(.*?)</li><li><span class=\"label\">房屋用途</span>(.*?)</li><li><span class=\"label\">房本年限</span>(.*?)</li><li><span class=\"label\">产权所属</span>(.*?)</li><li><span class=\"label\">是否唯一</span>(.*?)</li><li><span class=\"label\">小区类型</span>(.*?)</li><li><span class=\"label\">抵押信息</span>(.*?)</li><li><span class=\"label\">房本备件</span>(.*?)</li></ul></div></div>");
+    static Pattern transactionContentPattern = Pattern.compile("<div class=\"transaction\"><div class=\"name\">交易属性</div><div class=\"content\"><ul><li><span class=\"label\">挂牌时间</span>(.*?)</li><li><span class=\"label\">交易权属</span>(.*?)</li><li><span class=\"label\">上次交易</span>(.*?)</li><li><span class=\"label\">房屋用途</span>(.*?)</li><li><span class=\"label\">房本年限</span>(.*?)</li><li><span class=\"label\">产权所属</span>(.*?)</li><.*?是否唯一.*?>(.*?)</li.*?><.*?小区类型</span>(.*?)</li.*?><li><span class=\"label\">抵押信息</span>(.*?)</li><li><span class=\"label\">房本备件</span>(.*?)</li></ul></div></div>");
     static Pattern tagsHtmlPattern = Pattern.compile("<div class=\"name\">房源标签</div><div class=\"content\">(.*?)</div>");
     static Pattern tagsHtmlPattern_1 = Pattern.compile("<a class=\"tag\".*?>(.*?)</a>");
     static Pattern decoratingDescPattern = Pattern.compile("<div class=\"name\">装修描述</div><div class=\"content\">((.|\n|\r)*?)</div>");
@@ -121,7 +122,7 @@ public abstract class LianjiaWebUtil {
             Matcher matcher = houseUrlInPageWebPattern.matcher(result);
             while (matcher.find()) {
                 String fangUrl = matcher.group();
-                logger.info(fangUrl);
+                //logger.info(fangUrl);
                 urls.add(fangUrl);
             }
         logger.info("size:"+urls.size());
@@ -429,6 +430,8 @@ public abstract class LianjiaWebUtil {
     public static void main(String[] args) throws IOException {
 
         String url ="http://gz.lianjia.com/ershoufang/";
+        String url2 = "http://gz.lianjia.com/ershoufang/GZ0002180546.html";
+        String url3 = "http://gz.lianjia.com/ershoufang/GZ0001565595.html";
 
 //        System.getProperties().setProperty("proxySet", "true");
 //        System.getProperties().setProperty("socksProxyHost", "109.228.175.39");
@@ -443,7 +446,12 @@ public abstract class LianjiaWebUtil {
 
 
         ///////////////////////////////////////
-
+        try {
+            String houseHtml = LianjiaWebUtil.fetchHouseHtml(url3);
+        }catch (Error t){
+            logger.info("dddddd");
+        }
+        logger.info("vvvv");
 
 
     }

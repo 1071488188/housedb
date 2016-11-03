@@ -149,24 +149,30 @@ public  class ProcessServiceImpl implements ProcessService{
 		int step = 300;
 
 		while (true) {
-			List<Houseindex> houseindices = houseindexService.pageTodayUnCheck(start, step);
+			List<Houseindex> houseindexList = houseindexService.pageTodayUnCheck(start, step);
 
-			logger.info("checking price ..."+houseindices.size());
+			logger.info("checking price ..."+houseindexList.size());
 
-			if(houseindices==null || houseindices.size()==0)
+			if(houseindexList==null || houseindexList.size()==0)
 				break;
 
-			for (int i = 0; i < houseindices.size(); i++) {
+			for (int i = 0; i < houseindexList.size(); i++) {
 
 				try {
-					Thread.sleep(800);
+					Thread.sleep(2000);
 				}catch (Throwable t){
 					t.printStackTrace();
 				}
 
-				Houseindex houseindex = houseindices.get(i);
-
+				Houseindex houseindex = houseindexList.get(i);
 				String houseHtml = LianjiaWebUtil.fetchHouseHtml(houseindex.getUrl());
+				if("error".equals(houseHtml)){
+					//商品页面找不到，永久重定向
+					logger.info("house is not found, "+JSONObject.toJSONString(houseindex));
+					houseindex.setStatus(-301); //已下架
+					houseindexService.update(houseindex);
+					continue;
+				}
 
 				//判断是否下架
 				boolean remove = LianjiaWebUtil.getRemoved(houseHtml);
@@ -190,6 +196,8 @@ public  class ProcessServiceImpl implements ProcessService{
 					Houseprice tempHousePrice = new Houseprice(houseindex.getCode(), nowprice.doubleValue());
 					housepriceService.save(tempHousePrice);
 					logger.info("saving newest price :"+ JSONObject.toJSONString(tempHousePrice));
+				}else{
+					logger.info("price is the same,"+JSONObject.toJSONString(houseprice));
 				}
 				houseindexService.setTodayChecked(houseindex.getCode());
 			}
