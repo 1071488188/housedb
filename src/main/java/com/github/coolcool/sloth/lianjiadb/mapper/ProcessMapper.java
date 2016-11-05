@@ -31,7 +31,7 @@ public interface ProcessMapper{
 
 	@Insert({
 		"INSERT INTO process (area, pageNo, finished, createtime)",
-		"VALUE (#{area}, #{pageNo}, #{finished}, now()) ON DUPLICATE KEY UPDATE area=#{area}"
+		"VALUE (#{area}, #{pageNo}, #{finished}, curdate()) ON DUPLICATE KEY UPDATE area=#{area}"
 	})
 	Integer insert(Process process);
 
@@ -39,7 +39,7 @@ public interface ProcessMapper{
 	@Select("SELECT * FROM process LIMIT 50 ")
 	List<Process> list();
 
-	@Select("SELECT * FROM process where finished=0 LIMIT 50 ")
+	@Select("SELECT * FROM process where finished=0  ")
 	List<Process> listUnFinished();
 
 
@@ -51,7 +51,7 @@ public interface ProcessMapper{
 	Integer increment();
 
 
-	@Select("SELECT COUNT(*) FROM process where area=#{area} and to_days(createtime) = to_days(now())")
+	@Select("SELECT COUNT(*) FROM process where area=#{area} and createtime = curdate()")
 	Integer countTodayProcessByAreaCode(@Param("area") String areaCode);
 
 }

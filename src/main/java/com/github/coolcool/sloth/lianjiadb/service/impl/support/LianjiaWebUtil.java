@@ -108,7 +108,7 @@ public abstract class LianjiaWebUtil {
 
         Set<String> urls = new HashSet<>();
 
-        System.out.println("start fetching area=" + area + ",pageNo="+pageNo);
+        logger.info("start fetching area=" + area + ",pageNo="+pageNo);
         String pageUrl = null;
 
             String result = "";
@@ -125,7 +125,7 @@ public abstract class LianjiaWebUtil {
                 //logger.info(fangUrl);
                 urls.add(fangUrl);
             }
-        logger.info("size:"+urls.size());
+        logger.info("area=" + area + " size : "+urls.size());
         return urls;
     }
 

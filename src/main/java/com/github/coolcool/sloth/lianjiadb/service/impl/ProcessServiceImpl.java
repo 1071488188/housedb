@@ -71,15 +71,22 @@ public  class ProcessServiceImpl implements ProcessService{
 				while (iurl.hasNext()){
 					String houseUrl = iurl.next();
 					Houseindex houseindex = new Houseindex(houseUrl);
+					houseindex.setUpdatetime(new Date());
+					houseindex.setLastCheckDate(null);
+					houseindex.setStatus(1);
 
 					Houseindex tempHouseIndex = houseindexService.getByCode(houseindex.getCode());
 					if(tempHouseIndex!=null){
-
-						continue;
+						if(tempHouseIndex.getStatus()>0)
+							continue;
+						else{
+							houseindexService.update(houseindex);
+							logger.info("changed house index :"+JSONObject.toJSONString(houseindex));
+						}
 					}else {
 						//insert to db
 						houseindexService.save(houseindex);
-						logger.info("new house index "+houseindex.getCode()+" , save it .");
+						logger.info("saved house index : "+JSONObject.toJSONString(houseindex));
 					}
 				}
 
@@ -93,7 +100,7 @@ public  class ProcessServiceImpl implements ProcessService{
 				this.update(process);
 				process.setPageNo(process.getPageNo()+1);
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(500);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -206,7 +213,7 @@ public  class ProcessServiceImpl implements ProcessService{
 					}
 					Houseprice tempHousePrice = new Houseprice(houseindex.getCode(), nowprice.doubleValue());
 					housepriceService.save(tempHousePrice);
-					logger.info("changing newest price "+(up?"up:":"down:")+JSONObject.toJSONString(tempHousePrice));
+					logger.info("changing newest price "+(up?"up:":"down:")+JSONObject.toJSONString(houseprice)+"，"+JSONObject.toJSONString(tempHousePrice));
 				}else{
 					logger.info("price is the same,"+JSONObject.toJSONString(houseprice));
 				}
@@ -274,7 +281,9 @@ public  class ProcessServiceImpl implements ProcessService{
 			if(count>0)
 				continue;
 			Process process = new Process();
+			process.setPageNo(0);
 			process.setArea(area.getCode());
+			process.setFinished(0);
 			save(process);
 			logger.info("add  process "+ JSONObject.toJSONString(process));
 		}

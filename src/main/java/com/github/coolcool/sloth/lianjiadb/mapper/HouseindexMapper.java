@@ -29,7 +29,7 @@ public interface HouseindexMapper{
 	Integer deleteByPrimaryKey(@Param("primaryKey") Object primaryKey);
 
 	@Update({
-		"UPDATE houseindex SET id=#{id}, code=#{code}, url=#{url}, status=#{status}, createtime=#{createtime}, updatetime=#{updatetime},lastCheckDate=#{lastCheckDate}  where id = #{id}"
+		"UPDATE houseindex SET id=#{id}, code=#{code}, url=#{url}, status=#{status}, updatetime=#{updatetime},lastCheckDate=#{lastCheckDate}  where id = #{id}"
 	})
 	Integer updateByPrimaryKey(Houseindex houseindex);
 

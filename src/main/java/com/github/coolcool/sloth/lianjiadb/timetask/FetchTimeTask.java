@@ -31,7 +31,7 @@ public class FetchTimeTask extends TimerTask {
     /**
      * 生成当天任务
      */
-    @Scheduled(cron="0/15 * *  * * ? ")   //每15秒执行一次
+    @Scheduled(cron="0/30 * *  * * ? ")   //每30秒执行一次
     public void genProcess() {
         if(MyHttpClient.available && !genProcessing){
             genProcessing = true;
