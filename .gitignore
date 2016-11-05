@@ -19,3 +19,6 @@ src/main/java/com/github/coolcool/sloth/lianjiadb/mapper/HousepriceMapper.java
 src/main/java/com/github/coolcool/sloth/lianjiadb/model/Houseprice.java
 target/
 .DS_Store
+/src/main/java/com/github/coolcool/sloth/lianjiadb/common/MailUtil.java
+src/main/java/com/github/coolcool/sloth/lianjiadb/common/MailUtil.java
+src/main/resources/

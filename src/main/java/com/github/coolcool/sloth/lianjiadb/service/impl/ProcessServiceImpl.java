@@ -1,6 +1,7 @@
 package com.github.coolcool.sloth.lianjiadb.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.github.coolcool.sloth.lianjiadb.common.MailUtil;
 import com.github.coolcool.sloth.lianjiadb.model.*;
 import com.github.coolcool.sloth.lianjiadb.model.Process;
 import com.github.coolcool.sloth.lianjiadb.service.*;
@@ -208,12 +209,20 @@ public  class ProcessServiceImpl implements ProcessService{
 				}else if(houseprice.getPrice()!=nowprice.doubleValue()){
 					//save price change
 					boolean up = true;
+					String  temp = "0";
+					temp = Math.abs(houseprice.getPrice() - nowprice.doubleValue())+"";
 					if(houseprice.getPrice()>nowprice.doubleValue()){
 						up = false;
+
 					}
 					Houseprice tempHousePrice = new Houseprice(houseindex.getCode(), nowprice.doubleValue());
 					housepriceService.save(tempHousePrice);
 					logger.info("changing newest price "+(up?"up:":"down:")+JSONObject.toJSONString(houseprice)+"，"+JSONObject.toJSONString(tempHousePrice));
+
+					//邮件通知价格变动
+					String subject = "【房源价格调整】".concat(houseindex.getCode()).concat("价格").concat((up?"上升:":"下降:")).concat(temp);
+					String content = houseindex.getUrl()+"<br/>"+houseHtml;
+					MailUtil.send(subject, content);
 				}else{
 					logger.info("price is the same,"+JSONObject.toJSONString(houseprice));
 				}
@@ -292,6 +301,13 @@ public  class ProcessServiceImpl implements ProcessService{
 	@Override
 	public int countTodayProcessByAreaCode(String areaCode) {
 		return processMapper.countTodayProcessByAreaCode(areaCode);
+	}
+
+
+	public static void main(String[] args) {
+		double a = 134.0;
+		double b = 135.0;
+		System.out.println(Math.abs((b-a)));
 	}
 
 }
