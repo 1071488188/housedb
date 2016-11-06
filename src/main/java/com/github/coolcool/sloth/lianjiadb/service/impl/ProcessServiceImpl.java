@@ -220,7 +220,7 @@ public  class ProcessServiceImpl implements ProcessService{
 					logger.info("changing newest price "+(up?"up:":"down:")+JSONObject.toJSONString(houseprice)+"，"+JSONObject.toJSONString(tempHousePrice));
 
 					//邮件通知价格变动
-					String subject = "【房源价格调整】".concat(houseindex.getCode()).concat("价格").concat((up?"上升:":"下降:")).concat(temp);
+					String subject = "【房源价格调整】".concat("价格").concat((up?"上升:":"下降:")).concat(temp).concat("万").concat(houseindex.getCode());
 					String content = houseindex.getUrl()+"<br/>"+houseHtml;
 					MailUtil.send(subject, content);
 				}else{
