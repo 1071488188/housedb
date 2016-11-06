@@ -223,7 +223,7 @@ public  class ProcessServiceImpl implements ProcessService{
 
 					//邮件通知价格变动
 					String subject = "【房源价格调整】".concat("价格").concat((up?"上升:":"下降:")).concat(temp).concat("万").concat(houseindex.getCode());
-					String content = houseindex.getUrl()+"<br/>" +
+					String content = "<br/>" +
 							nowhouse.getTitle()+"<br/>" +
 							nowhouse.getSubtitle()+"<br/>" +
 							"【地址】："+nowhouse.getAreaName()+"<br/>" +

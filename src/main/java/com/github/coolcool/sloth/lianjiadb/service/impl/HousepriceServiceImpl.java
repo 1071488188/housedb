@@ -71,7 +71,7 @@ public  class HousepriceServiceImpl implements HousepriceService{
 	}
 
 	@Override
-	public Houseprice getNewest(String code){
+	public Houseprice getPrevious(String code){
 		List<Houseprice> houseprices = housepriceMapper.listNewest(code);
 		if(houseprices==null || houseprices.size()==0)
 			return null;
