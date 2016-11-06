@@ -157,6 +157,7 @@ public  class ProcessServiceImpl implements ProcessService{
 		int step = 300;
 
 		while (true) {
+			//分页获取今天需要被检测的houseIndex
 			List<Houseindex> houseindexList = houseindexService.pageTodayUnCheck(start, step);
 
 			logger.info("checking price ..."+houseindexList.size());
@@ -195,36 +196,50 @@ public  class ProcessServiceImpl implements ProcessService{
 
 				//判断价格变更
 				BigDecimal nowprice = LianjiaWebUtil.getPrice(houseHtml);
+				House nowhouse = LianjiaWebUtil.getAndGenHouseObject(houseHtml);
 				if(nowprice==null){
 					logger.info("nowprice is null, "+ JSONObject.toJSONString(houseindex));
 					continue;
 				}
 
-				Houseprice houseprice = housepriceService.getNewest(houseindex.getCode());
-				if(houseprice==null){
+				Houseprice previousHouseprice = housepriceService.getPrevious(houseindex.getCode());
+				if(previousHouseprice==null){
 					//save newest price
 					Houseprice tempHousePrice = new Houseprice(houseindex.getCode(), nowprice.doubleValue());
 					housepriceService.save(tempHousePrice);
 					logger.info("saving newest price :"+ JSONObject.toJSONString(tempHousePrice));
-				}else if(houseprice.getPrice()!=nowprice.doubleValue()){
+				}else if(previousHouseprice.getPrice()!=nowprice.doubleValue()){
 					//save price change
 					boolean up = true;
 					String  temp = "0";
-					temp = Math.abs(houseprice.getPrice() - nowprice.doubleValue())+"";
-					if(houseprice.getPrice()>nowprice.doubleValue()){
+					temp = Math.abs(previousHouseprice.getPrice() - nowprice.doubleValue())+"";
+					if(previousHouseprice.getPrice()>nowprice.doubleValue()){
 						up = false;
 
 					}
 					Houseprice tempHousePrice = new Houseprice(houseindex.getCode(), nowprice.doubleValue());
 					housepriceService.save(tempHousePrice);
-					logger.info("changing newest price "+(up?"up:":"down:")+JSONObject.toJSONString(houseprice)+"，"+JSONObject.toJSONString(tempHousePrice));
+					logger.info("changing newest price "+(up?"up:":"down:")+JSONObject.toJSONString(previousHouseprice)+"，"+JSONObject.toJSONString(tempHousePrice));
 
 					//邮件通知价格变动
 					String subject = "【房源价格调整】".concat("价格").concat((up?"上升:":"下降:")).concat(temp).concat("万").concat(houseindex.getCode());
-					String content = houseindex.getUrl()+"<br/>"+houseHtml;
+					String content = houseindex.getUrl()+"<br/>" +
+							nowhouse.getTitle()+"<br/>" +
+							nowhouse.getSubtitle()+"<br/>" +
+							"【地址】："+nowhouse.getAreaName()+"<br/>" +
+							"【价格】："+nowhouse.getPrice()+"万 <br/>" +
+							"【均价】："+nowhouse.getUnitprice()+"万 <br/>" +
+							"【面积】："+nowhouse.getAreaMainInfo() +"<br/>" +
+							"【楼龄】："+nowhouse.getAreaSubInfo() +"<br/>" +
+							"【室厅】："+nowhouse.getRoomMainInfo() +"<br/>" +
+							"【楼层】："+nowhouse.getRoomSubInfo() +"<br/>" +
+							"【朝向】："+nowhouse.getRoomMainType() +"<br/>" +
+							"【装修】："+nowhouse.getRoomSubType()+"<br/>" +
+							"【源地址】：<a href=\""+houseindex.getUrl()+"\">"+houseindex.getUrl()+"</a>"+
+							"";
 					MailUtil.send(subject, content);
 				}else{
-					logger.info("price is the same,"+JSONObject.toJSONString(houseprice));
+					logger.info("price is the same,"+JSONObject.toJSONString(previousHouseprice));
 				}
 				houseindexService.setTodayChecked(houseindex.getCode());
 			}

@@ -29,6 +29,7 @@ public interface HousepriceService{
 
 	Integer increment();
 
-	Houseprice getNewest(String code);
+	Houseprice getPrevious(String code);
+
 
 }

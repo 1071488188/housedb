@@ -177,8 +177,6 @@ public abstract class LianjiaWebUtil {
     }
 
 
-
-
     public static House fetchAndGenHouseObject(String houseUrl) {
         House house = new House(houseUrl);
         String fangUrl = houseUrl;
@@ -186,75 +184,78 @@ public abstract class LianjiaWebUtil {
         //result = result.replace("\r","").replace("\n","").replaceAll(">(.*?)<","");
         String reg = ">\\s+([^\\s<]*)\\s+<";
         result = result.replaceAll(reg, ">$1<");
-        //System.out.println(result);
+        return getAndGenHouseObject(result);
+    }
 
-        house.setHtml(result);
+    public static House getAndGenHouseObject(String houseHtml) {
+        House house = new House();
+        house.setHtml(houseHtml);
 
-        matcher = titlePattern.matcher(result);
+        matcher = titlePattern.matcher(houseHtml);
         if(matcher.find()) {
             house.setTitle(matcher.group(1));
         }
 
-        matcher = subTitlePattern.matcher(result);
+        matcher = subTitlePattern.matcher(houseHtml);
         if(matcher.find()) {
             house.setSubtitle(matcher.group(1));
         }
 
-        matcher = favCountPattern.matcher(result);
+        matcher = favCountPattern.matcher(houseHtml);
         if(matcher.find()) {
             house.setFavcount(Integer.parseInt(matcher.group(1)));
         }
 
-        matcher = cartCountPattern.matcher(result);
+        matcher = cartCountPattern.matcher(houseHtml);
         if(matcher.find()) {
             house.setCartcount(Integer.parseInt(matcher.group(1)));
         }
 
-        matcher = pricePattern.matcher(result);
+        matcher = pricePattern.matcher(houseHtml);
         if(matcher.find()) {
             house.setPrice(new BigDecimal(matcher.group(1)));
         }
 
-        matcher = unitPricePattern.matcher(result);
+        matcher = unitPricePattern.matcher(houseHtml);
         if(matcher.find()) {
             house.setUnitprice(new BigDecimal(matcher.group(1)));
         }
 
-        matcher = firstPayPricePattern.matcher(result);
+        matcher = firstPayPricePattern.matcher(houseHtml);
         if(matcher.find()) {
             house.setFirstPayPrice(new BigDecimal(matcher.group(1)));
         }
 
-        matcher = taxPricePattern.matcher(result);
+        matcher = taxPricePattern.matcher(houseHtml);
         if(matcher.find()) {
             house.setTaxPrice(new BigDecimal(matcher.group(1)));
         }
 
-        matcher = roomMainAndSubInfoPattern.matcher(result);
+        matcher = roomMainAndSubInfoPattern.matcher(houseHtml);
         if(matcher.find()) {
             house.setRoomMainInfo(matcher.group(1));
             house.setRoomSubInfo(matcher.group(2));
         }
 
-        matcher = roomMainAndSubTypePattern.matcher(result);
+        matcher = roomMainAndSubTypePattern.matcher(houseHtml);
         if(matcher.find()) {
             house.setRoomMainType(matcher.group(1));
             house.setRoomSubType(matcher.group(2));
         }
 
 
-        matcher = areaMainAndSubInfoPattern.matcher(result);
+        matcher = areaMainAndSubInfoPattern.matcher(houseHtml);
         if(matcher.find()) {
             house.setAreaMainInfo(matcher.group(1));
             house.setAreaSubInfo(matcher.group(2));
         }
 
-        matcher = communityNamePattern.matcher(result);
+        matcher = communityNamePattern.matcher(houseHtml);
         if(matcher.find()) {
             house.setCommunityName(matcher.group(1));
         }
 
-        matcher = areaNameHtmlPattern.matcher(result);
+        matcher = areaNameHtmlPattern.matcher(houseHtml);
         if(matcher.find()) {
             String r = matcher.group(1);
             Matcher tmatcher = areaNameHtmlPattern_1.matcher(r);
@@ -265,12 +266,12 @@ public abstract class LianjiaWebUtil {
             house.setAreaName(sb.toString());
         }
 
-        matcher = schoolNamePattern.matcher(result);
+        matcher = schoolNamePattern.matcher(houseHtml);
         if(matcher.find()) {
             house.setSchoolName(matcher.group(1));
         }
 
-        matcher = baseContentPattern.matcher(result);
+        matcher = baseContentPattern.matcher(houseHtml);
         if(matcher.find()) {
             house.setBaseContent1(matcher.group(1));
             house.setBaseContent2(matcher.group(2));
@@ -286,7 +287,7 @@ public abstract class LianjiaWebUtil {
             house.setBaseContent12(matcher.group(12));
         }
 
-        matcher = transactionContentPattern.matcher(result);
+        matcher = transactionContentPattern.matcher(houseHtml);
         if(matcher.find()) {
             house.setTransactionContent1(matcher.group(1));
             house.setTransactionContent2(matcher.group(2));
@@ -304,7 +305,7 @@ public abstract class LianjiaWebUtil {
         }
 
 
-        matcher = tagsHtmlPattern.matcher(result);
+        matcher = tagsHtmlPattern.matcher(houseHtml);
         if(matcher.find()) {
             String tagsHtml = matcher.group(1);
             Matcher tmatcher = tagsHtmlPattern_1.matcher(tagsHtml);
@@ -315,49 +316,49 @@ public abstract class LianjiaWebUtil {
             house.setTags(tagsb.toString());
         }
 
-        matcher = decoratingDescPattern.matcher(result);
+        matcher = decoratingDescPattern.matcher(houseHtml);
         if(matcher.find()) {
             house.setDecoratingDesc(matcher.group(1).replace("  ","").replaceAll("\n|\r",""));
         }
 
-        matcher = houseTypeDescPattern.matcher(result);
+        matcher = houseTypeDescPattern.matcher(houseHtml);
         if(matcher.find()) {
             house.setHouseTypeDesc(matcher.group(1).replace("  ","").replaceAll("\n|\r",""));
         }
 
-        matcher = investmentDescPattern.matcher(result);
+        matcher = investmentDescPattern.matcher(houseHtml);
         if(matcher.find()) {
             house.setInvestmentDesc(matcher.group(1).replace("  ","").replaceAll("\n|\r",""));
         }
 
-        matcher = villageDescPattern.matcher(result);
+        matcher = villageDescPattern.matcher(houseHtml);
         if(matcher.find()) {
             house.setVillageDesc(matcher.group(1).replace("  ","").replaceAll("\n|\r",""));
         }
 
-        matcher = schoolDescPattern.matcher(result);
+        matcher = schoolDescPattern.matcher(houseHtml);
         if(matcher.find()) {
             house.setSchoolDesc(matcher.group(1).replace("  ","").replaceAll("\n|\r",""));
         }
 
-        matcher = sellingPointDescPattern.matcher(result);
+        matcher = sellingPointDescPattern.matcher(houseHtml);
         if(matcher.find()) {
             house.setSellingPointDesc(matcher.group(1).replace("  ","").replaceAll("\n|\r",""));
         }
 
 
-        matcher = reason4saleDescPattern.matcher(result);
+        matcher = reason4saleDescPattern.matcher(houseHtml);
         if(matcher.find()) {
             house.setReason4saleDesc(matcher.group(1).replace("  ","").replaceAll("\n|\r",""));
         }
 
 
-        matcher = supportingDescPattern.matcher(result);
+        matcher = supportingDescPattern.matcher(houseHtml);
         if(matcher.find()) {
             house.setSupportingDesc(matcher.group(1).replace("  ","").replaceAll("\n|\r",""));
         }
 
-        matcher = trafficDescPattern.matcher(result);
+        matcher = trafficDescPattern.matcher(houseHtml);
         if(matcher.find()) {
             house.setTrafficDesc(matcher.group(1).replace("  ","").replaceAll("\n|\r",""));
         }
