@@ -23,7 +23,7 @@ public class CheckHttpProxyTask extends TimerTask {
     static boolean running = false;
 
     @Override
-    @Scheduled(cron="0/60 * * * * ? ")   //每60执行一次
+    @Scheduled(cron="0 0/5 * * * ?")   //每5分钟执行一次
     public void run() {
         if(!running){
             running = true;

@@ -31,7 +31,7 @@ public class FetchTimeTask extends TimerTask {
     /**
      * 生成当天任务
      */
-    @Scheduled(cron="0/30 * *  * * ? ")   //每30秒执行一次
+    @Scheduled(cron="0 0 8 * * ?")   //每天8点执行一次
     public void genProcess() {
         if(MyHttpClient.available && !genProcessing){
             genProcessing = true;
@@ -50,7 +50,7 @@ public class FetchTimeTask extends TimerTask {
      * 根据当天的执行任务，按最小区域（车陂、华景）分页获取房屋链接地址，入库 houseindex
      */
     @Override
-    @Scheduled(cron="0/5 * * * * ? ")   //每5秒执行一次
+    @Scheduled(cron="0 0/1 * * * ?")   //每5分钟执行一次
     public void run() {
         if(MyHttpClient.available && !houseUrlsFetching){
             houseUrlsFetching = true;
@@ -64,7 +64,7 @@ public class FetchTimeTask extends TimerTask {
         }
     }
 
-    @Scheduled(cron="0/5 * * * * ? ")   //每5秒执行一次
+    @Scheduled(cron="0 0/1 * * * ?")   //每5秒执行一次
     public void fetching() {
         if(MyHttpClient.available && !houseDetailFetching){
             houseDetailFetching = true;
