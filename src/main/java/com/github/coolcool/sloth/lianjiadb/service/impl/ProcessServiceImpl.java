@@ -196,7 +196,7 @@ public  class ProcessServiceImpl implements ProcessService{
 
 				//判断价格变更
 				BigDecimal nowprice = LianjiaWebUtil.getPrice(houseHtml);
-				House nowhouse = LianjiaWebUtil.getAndGenHouseObject(houseHtml);
+				House nowhouse = LianjiaWebUtil.getAndGenHouseObject(houseindex.getUrl(), houseHtml);
 				if(nowprice==null){
 					logger.info("nowprice is null, "+ JSONObject.toJSONString(houseindex));
 					continue;

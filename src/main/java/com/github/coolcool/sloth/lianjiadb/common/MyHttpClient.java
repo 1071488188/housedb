@@ -101,7 +101,7 @@ public abstract class MyHttpClient {
         StringBuilder sb = new StringBuilder();
         Proxy proxy = null;
         // /创建代理服务器
-        if(!StringUtils.isEmpty(httpProxyConfig.getHost())) {
+        if(httpProxyConfig!=null && !StringUtils.isEmpty(httpProxyConfig.getHost())) {
             InetSocketAddress addr = new InetSocketAddress(httpProxyConfig.getHost(), httpProxyConfig.getPort());
             if (httpProxyConfig.getType() == 1)
                 proxy = new Proxy(Proxy.Type.SOCKS, addr); // Socket 代理
@@ -113,7 +113,7 @@ public abstract class MyHttpClient {
         InputStream is = null;
         try {
             URL tempUrl = new URL(url);
-            if(StringUtils.isEmpty(httpProxyConfig.getHost())){
+            if(httpProxyConfig==null || StringUtils.isEmpty(httpProxyConfig.getHost())){
                 connection = (HttpURLConnection) tempUrl.openConnection();
             }else {
                 connection = (HttpURLConnection) tempUrl.openConnection(proxy);

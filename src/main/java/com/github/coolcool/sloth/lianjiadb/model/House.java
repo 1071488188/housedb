@@ -25,17 +25,10 @@ public class House {
 
 	}
 
-	/**
-	   
-	 */
 	private Long id;
-	/**
-	   
-	 */
+
 	private String code;
-	/**
-	   
-	 */
+
 	private String url;
 	/**
 	   
@@ -240,6 +233,8 @@ public class House {
 
 	@JSONField(serialize=false)
 	private  String html;
+
+	private  double roomSize;
 
 
 	public Long getId() {
@@ -620,5 +615,13 @@ public class House {
 
 	public void setHtml(String html) {
 		this.html = html;
+	}
+
+	public double getRoomSize() {
+		return roomSize;
+	}
+
+	public void setRoomSize(double roomSize) {
+		this.roomSize = roomSize;
 	}
 }

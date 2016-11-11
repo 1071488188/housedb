@@ -184,11 +184,15 @@ public abstract class LianjiaWebUtil {
         //result = result.replace("\r","").replace("\n","").replaceAll(">(.*?)<","");
         String reg = ">\\s+([^\\s<]*)\\s+<";
         result = result.replaceAll(reg, ">$1<");
-        return getAndGenHouseObject(result);
+        return getAndGenHouseObject(houseUrl,result);
     }
 
-    public static House getAndGenHouseObject(String houseHtml) {
-        House house = new House();
+    public static House getAndGenHouseObject(String houseUrl,String houseHtml) {
+
+        String reg = ">\\s+([^\\s<]*)\\s+<";
+        houseHtml = houseHtml.replaceAll(reg, ">$1<");
+
+        House house = new House(houseUrl);
         house.setHtml(houseHtml);
 
         matcher = titlePattern.matcher(houseHtml);
