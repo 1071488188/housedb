@@ -7,3 +7,8 @@ Housedb 1.0
 ===
 - __定期更新房源数据__　
 - __提供房源价格变动通知服务__
+
+演示
+===
+- https://raw.githubusercontent.com/coolcooldee/housedb/master/src/main/resources/images/demo.PNG
+- https://raw.githubusercontent.com/coolcooldee/housedb/master/src/main/resources/images/demo2.PNG
