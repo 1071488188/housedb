@@ -56,7 +56,13 @@ public abstract class LianjiaWebUtil {
     static Pattern communityNamePattern = Pattern.compile("<div class=\"communityName\"><i></i><span class=\"label\">.*?><a.*?>(.*?)</a>");
     static Pattern areaNameHtmlPattern = Pattern.compile("<div class=\"areaName\"><i></i><span class=\"label\">所在区域</span><span class=\"info\">(.*?)</span>");
     static Pattern areaNameHtmlPattern_1 = Pattern.compile("<a.*?>(.*?)</a>");
-    static Pattern schoolNamePattern = Pattern.compile("<div class=\"schoolName\"><i class=\"icon\"></i><span class=\"label\">对口学校</span><span class=\"info\"><a.*?>(.*?)<");
+
+
+    static Pattern schoolNamePattern = Pattern.compile("<.*?>对口学校.*?title=\"(.*?)\">");
+
+
+
+
     static Pattern baseContentPattern = Pattern.compile("<div class=\"base\"><div class=\"name\">基本属性</div><div class=\"content\"><ul><li><span class=\"label\">房屋户型</span>(.*?)</li><li><span class=\"label\">所在楼层</span>(.*?)</li><li><span class=\"label\">建筑面积</span>(.*?)</li><li><span class=\"label\">户型结构</span>(.*?)</li><li><span class=\"label\">套内面积</span>(.*?)</li><li><span class=\"label\">建筑类型</span>(.*?)</li><li><span class=\"label\">房屋朝向</span>(.*?)</li><li><span class=\"label\">建筑结构</span>(.*?)</li><li><span class=\"label\">装修情况</span>(.*?)</li><li><span class=\"label\">梯户比例</span>(.*?)</li><li><span class=\"label\">供暖方式</span>(.*?)</li><li><span class=\"label\">配备电梯</span>(.*?)</li></ul></div></div>");
     static Pattern transactionContentPattern = Pattern.compile("<div class=\"transaction\"><div class=\"name\">交易属性</div><div class=\"content\"><ul><li><span class=\"label\">挂牌时间</span>(.*?)</li><li><span class=\"label\">交易权属</span>(.*?)</li><li><span class=\"label\">上次交易</span>(.*?)</li><li><span class=\"label\">房屋用途</span>(.*?)</li><li><span class=\"label\">房本年限</span>(.*?)</li><li><span class=\"label\">产权所属</span>(.*?)</li><.*?是否唯一.*?>(.*?)</li.*?><.*?小区类型</span>(.*?)</li.*?><li><span class=\"label\">抵押信息</span>(.*?)</li><li><span class=\"label\">房本备件</span>(.*?)</li></ul></div></div>");
     static Pattern tagsHtmlPattern = Pattern.compile("<div class=\"name\">房源标签</div><div class=\"content\">(.*?)</div>");
@@ -250,7 +256,9 @@ public abstract class LianjiaWebUtil {
 
         matcher = areaMainAndSubInfoPattern.matcher(houseHtml);
         if(matcher.find()) {
-            house.setAreaMainInfo(matcher.group(1));
+            String temp = matcher.group(1);
+            house.setAreaMainInfo(temp);
+            house.setRoomSize(Double.parseDouble(temp.replaceAll("平米","")));
             house.setAreaSubInfo(matcher.group(2));
         }
 
