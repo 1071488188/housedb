@@ -115,23 +115,22 @@ public  class ProcessServiceImpl implements ProcessService{
 		int pageNo = 1;
 		int pageSize = 300;
 		boolean stop = false;
-		while (true && !stop) {
+		while (!stop) {
+			//状态为 0
 			Page<Houseindex> houseindexPage = houseindexService.page(pageNo, pageSize);
-			if(houseindexPage==null || houseindexPage.getResult().size()==0)
+			if(houseindexPage==null || houseindexPage.getResult()==null || houseindexPage.getResult().size()==0)
 				break;
 			List<Houseindex> houseindexList = houseindexPage.getResult();
-			if(houseindexList==null)
-				break;
 			//fetch detail
 			for (int i = 0; i < houseindexList.size(); i++) {
 				Houseindex h = houseindexList.get(i);
-				if(h.getStatus()>0)
-					continue;
 				House house = LianjiaWebUtil.fetchAndGenHouseObject(h.getUrl());
 
 				if(StringUtils.isEmpty(house.getTitle())|| StringUtils.isBlank(house.getTitle())){
-					stop = true;
-					break;
+					//stop = true;
+					//break;
+					logger .warn("house title is null "+JSONObject.toJSONString(house));
+					continue;
 				}
 
 				//insert into db
@@ -141,7 +140,7 @@ public  class ProcessServiceImpl implements ProcessService{
 				houseindexService.update(h);
 				logger.info("saving house:"+ JSONObject.toJSONString(house));
 				try {
-					Thread.sleep(2000);
+					Thread.sleep(1500);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
