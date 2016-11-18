@@ -127,18 +127,19 @@ public  class ProcessServiceImpl implements ProcessService{
 				House house = LianjiaWebUtil.fetchAndGenHouseObject(h.getUrl());
 
 				if(StringUtils.isEmpty(house.getTitle())|| StringUtils.isBlank(house.getTitle())){
-					//stop = true;
-					//break;
 					logger .warn("house title is null "+JSONObject.toJSONString(house));
-					continue;
+					h.setStatus(-2);
+					h.setUpdatetime(new Date());
+					houseindexService.update(h);
+				}else{
+					//insert into db
+					houseService.save(house);
+					h.setStatus(1);
+					h.setUpdatetime(new Date());
+					houseindexService.update(h);
+					logger.info("saving house:"+ JSONObject.toJSONString(house));
 				}
 
-				//insert into db
-				houseService.save(house);
-				h.setStatus(1);
-				h.setUpdatetime(new Date());
-				houseindexService.update(h);
-				logger.info("saving house:"+ JSONObject.toJSONString(house));
 				try {
 					Thread.sleep(1500);
 				} catch (InterruptedException e) {

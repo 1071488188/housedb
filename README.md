@@ -8,6 +8,17 @@ Housedb 1.0
 - __定期更新房源数据__　
 - __提供房源价格变动通知服务__
 
+数据统计
+====
+- __各个区域的房源数量情况__
+![](https://raw.githubusercontent.com/coolcooldee/housedb/master/src/main/resources/images/demo3.png)
+- __各个区域的均价情况__
+![](https://raw.githubusercontent.com/coolcooldee/housedb/master/src/main/resources/images/demo4.png)
+- __不同楼龄的房源数量情况__
+![](https://raw.githubusercontent.com/coolcooldee/housedb/master/src/main/resources/images/demo5.png)
+- __关注数最高的房源情况__
+![](https://raw.githubusercontent.com/coolcooldee/housedb/master/src/main/resources/images/demo6.png)
+
 演示
 ===
 ![](https://raw.githubusercontent.com/coolcooldee/housedb/master/src/main/resources/images/demo.PNG)

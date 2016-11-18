@@ -5,10 +5,13 @@ import com.github.coolcool.sloth.lianjiadb.service.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.TimerTask;
 
 
@@ -21,6 +24,8 @@ public class FetchTimeTask extends TimerTask {
     @Autowired
     private ProcessService processService;
 
+    @Value("${com.github.coolcool.sloth.lianjiadb.timetask.genprocess.hour:8}")
+    int genprocessHour;
 
 
     static boolean houseUrlsFetching = false;
@@ -31,8 +36,13 @@ public class FetchTimeTask extends TimerTask {
     /**
      * 生成当天任务
      */
-    @Scheduled(cron="0 0 8 * * ?")   //每天8点执行一次
+    @Scheduled(cron="0 0/5 * * * ?")
     public void genProcess() {
+
+        //每天8点执行一次
+        if(LocalTime.now().getHour() != genprocessHour)
+            return;
+
         if(MyHttpClient.available && !genProcessing){
             genProcessing = true;
             log.info("开始执行genProcessing...");

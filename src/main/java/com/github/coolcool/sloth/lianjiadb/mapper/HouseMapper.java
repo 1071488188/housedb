@@ -40,7 +40,7 @@ public interface HouseMapper{
 	List<House> list();
 
 
-	@Select("SELECT * FROM house LIMIT #{start}, #{step}")
+	@Select("SELECT code, url, title, subtitle, favcount, cartcount, price, unitprice, firstPayPrice, taxPrice, roomMainInfo, roomSubInfo, roomMainType, roomSubType, areaMainInfo, areaSubInfo, communityName, areaName, schoolName, tags, decoratingDesc, houseTypeDesc, investmentDesc, villageDesc, schoolDesc, sellingPointDesc, reason4saleDesc, supportingDesc, trafficDesc, createtime, baseContent1, baseContent2, baseContent3, baseContent4, baseContent5, baseContent6, baseContent7, baseContent8, baseContent9, baseContent10, baseContent11, baseContent12, transactionContent1, transactionContent2, transactionContent3, transactionContent4, transactionContent5, transactionContent6, transactionContent7, transactionContent8, transactionContent9, transactionContent10,roomSize FROM house LIMIT #{start}, #{step}")
 	List<House> page(@Param("start") int start, @Param("step") int step);
 
 
