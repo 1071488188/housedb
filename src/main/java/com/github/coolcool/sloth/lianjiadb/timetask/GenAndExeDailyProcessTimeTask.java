@@ -10,16 +10,18 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.TimerTask;
 
-
+/**
+ * Created by dee on 2016/11/19.
+ */
 @EnableScheduling
 @Service
-public class FetchTimeTask extends TimerTask {
+public class GenAndExeDailyProcessTimeTask extends TimerTask {
 
-    private static final Logger log = LoggerFactory.getLogger(FetchTimeTask.class);
+
+    private static final Logger log = LoggerFactory.getLogger(FetchHouseIndexTimeTask.class);
 
     @Autowired
     private ProcessService processService;
@@ -27,18 +29,19 @@ public class FetchTimeTask extends TimerTask {
     @Value("${com.github.coolcool.sloth.lianjiadb.timetask.genprocess.hour:8}")
     int genprocessHour;
 
-
-    static boolean houseUrlsFetching = false;
-    static boolean houseDetailFetching = false;
     static boolean genProcessing = false;
+    static boolean houseUrlsFetching = false;
 
+    @Override
+    public void run() {
+
+    }
 
     /**
      * 生成当天任务
      */
     @Scheduled(cron="0 0/5 * * * ?")
-    public void genProcess() {
-
+    public void gen() {
         //每天8点执行一次
         if(LocalTime.now().getHour() != genprocessHour)
             return;
@@ -56,12 +59,12 @@ public class FetchTimeTask extends TimerTask {
     }
 
 
+
     /**
      * 根据当天的执行任务，按最小区域（车陂、华景）分页获取房屋链接地址，入库 houseindex
      */
-    @Override
-    @Scheduled(cron="0 0/1 * * * ?")   //每5分钟执行一次
-    public void run() {
+    @Scheduled(cron="0 0/5 * * * ?")   //每5分钟执行一次
+    public void exe() {
         if(MyHttpClient.available && !houseUrlsFetching){
             houseUrlsFetching = true;
             log.info("开始执行houseUrlsFetching...");
@@ -74,18 +77,8 @@ public class FetchTimeTask extends TimerTask {
         }
     }
 
-    @Scheduled(cron="0 0/1 * * * ?")   //每5秒执行一次
-    public void fetching() {
-        if(MyHttpClient.available && !houseDetailFetching){
-            houseDetailFetching = true;
-            log.info("开始执行houseDetailFetching...");
-            try {
-                processService.fetchHouseDetail();
-            }catch (Throwable t){
-                t.printStackTrace();
-            }
-            houseDetailFetching = false;
-        }
-    }
-    
+
+
+
+
 }

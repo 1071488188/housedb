@@ -66,6 +66,17 @@ public  class HouseServiceImpl implements HouseService{
 	}
 
 	@Override
+	public Page<House> pageToday(int pageNo, int pageSize){
+		Page<House> page = new Page<>();
+		int start = (pageNo-1)*pageSize;
+		page.setPageSize(pageSize);
+		page.setStart(start);
+		page.setResult(houseMapper.pageToday(start,pageSize));
+		page.setTotalCount(houseMapper.count());
+		return page;
+	}
+
+	@Override
 	public Integer increment(){
 		return houseMapper.increment();
 	}

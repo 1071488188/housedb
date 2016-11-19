@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.coolcool.sloth.lianjiadb.common.MyHttpClient;
 import com.github.coolcool.sloth.lianjiadb.common.Util;
 import com.github.coolcool.sloth.lianjiadb.model.House;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,13 +31,22 @@ public abstract class LianjiaWebUtil {
     static String firstPageAreasUrl = "http://gz.lianjia.com/ershoufang/${area}/";
     static String pageAreasUrl = "http://gz.lianjia.com/ershoufang/${area}/pg${pageNo}/";
 
+    static String firstChenjiaoPageAreasUrl = "http://gz.lianjia.com/chengjiao/${area}/";
+    static String chengjiaoPageAreasUrl = "http://gz.lianjia.com/chengjiao/${area}/";
+
+
+
+
 
 
     //解析正则
     static Matcher matcher = null;
     static Pattern houseUrlInPageWebPattern = Pattern.compile("http://gz.lianjia.com/ershoufang/GZ[0-9]+.html");
+    static Pattern chengjiaoHouseUrlInPageWebPattern = Pattern.compile("http://gz.lianjia.com/chengjiao/GZ[0-9]+" +
+            ".html");
     static Pattern totalPageNoInPageWebPattern = Pattern.compile("\"totalPage\":([0-9]+)");
-    //详细信息
+
+    //在售详细信息
     static Pattern titlePattern = Pattern.compile("class=\"main\" title=\"(.*?)\"");
     static Pattern subTitlePattern = Pattern.compile("class=\"sub\" title=\"(.*?)\"");
 
@@ -60,9 +70,6 @@ public abstract class LianjiaWebUtil {
 
     static Pattern schoolNamePattern = Pattern.compile("<.*?>对口学校.*?title=\"(.*?)\">");
 
-
-
-
     static Pattern baseContentPattern = Pattern.compile("<div class=\"base\"><div class=\"name\">基本属性</div><div class=\"content\"><ul><li><span class=\"label\">房屋户型</span>(.*?)</li><li><span class=\"label\">所在楼层</span>(.*?)</li><li><span class=\"label\">建筑面积</span>(.*?)</li><li><span class=\"label\">户型结构</span>(.*?)</li><li><span class=\"label\">套内面积</span>(.*?)</li><li><span class=\"label\">建筑类型</span>(.*?)</li><li><span class=\"label\">房屋朝向</span>(.*?)</li><li><span class=\"label\">建筑结构</span>(.*?)</li><li><span class=\"label\">装修情况</span>(.*?)</li><li><span class=\"label\">梯户比例</span>(.*?)</li><li><span class=\"label\">供暖方式</span>(.*?)</li><li><span class=\"label\">配备电梯</span>(.*?)</li></ul></div></div>");
     static Pattern transactionContentPattern = Pattern.compile("<div class=\"transaction\"><div class=\"name\">交易属性</div><div class=\"content\"><ul><li><span class=\"label\">挂牌时间</span>(.*?)</li><li><span class=\"label\">交易权属</span>(.*?)</li><li><span class=\"label\">上次交易</span>(.*?)</li><li><span class=\"label\">房屋用途</span>(.*?)</li><li><span class=\"label\">房本年限</span>(.*?)</li><li><span class=\"label\">产权所属</span>(.*?)</li><.*?是否唯一.*?>(.*?)</li.*?><.*?小区类型</span>(.*?)</li.*?><li><span class=\"label\">抵押信息</span>(.*?)</li><li><span class=\"label\">房本备件</span>(.*?)</li></ul></div></div>");
     static Pattern tagsHtmlPattern = Pattern.compile("<div class=\"name\">房源标签</div><div class=\"content\">(.*?)</div>");
@@ -76,16 +83,69 @@ public abstract class LianjiaWebUtil {
     static Pattern reason4saleDescPattern = Pattern.compile("<div class=\"name\">售房原因</div><div class=\"content\">((.|\n|\r)*?)</div>");
     static Pattern supportingDescPattern = Pattern.compile("<div class=\"name\">周边配套</div><div class=\"content\">((.|\n|\r)*?)</div>");
     static Pattern trafficDescPattern = Pattern.compile("<div class=\"name\">交通出行</div><div class=\"content\">((.|\n|\r)*?)</div>");
-    static Pattern Pattern172 = Pattern.compile("");
-    static Pattern Pattern182 = Pattern.compile("");
-    static Pattern Pattern192 = Pattern.compile("");
-    static Pattern Pattern102 = Pattern.compile("");
-    static Pattern Pattern11 = Pattern.compile("");
-    static Pattern Pattern126 = Pattern.compile("");
-    static Pattern Pattern127 = Pattern.compile("");
-    static Pattern Pattern128 = Pattern.compile("");
-    static Pattern Pattern129 = Pattern.compile("");
 
+
+    //已成交=======================================
+
+    static Pattern chengjiaoTitlePattern = Pattern.compile("<div class=\"house-title\"><div class=\"wrapper\">(.*?)<span>");
+    static Pattern chengjiaoPrice = Pattern.compile("<span class=\"dealTotalPrice\"><i>(\\d+(\\.\\d+)?)" +
+            "</i>万</span><b>(\\d+(\\.\\d+)?)</b>");
+
+    static Pattern t1 = Pattern.compile("class=\"sp01\"><label>(.*?)</label>(.*?)</span>"); //<span class="sp01"><label>1室1厅</label>高楼层(共27层)</span>
+    static Pattern t2 = Pattern.compile("class=\"sp02\"><label>(.*?)</label>"); //<span
+    // <span class="sp02"><label>东</label>暂无数据</span>
+
+    static Pattern t3 = Pattern.compile("class=\"sp03\"><label>(.*?)</label>(.*?)</span>");//<span
+    // class="sp03"><label>44平米</label>2008年建塔楼</span>
+
+    static Pattern t4 = Pattern.compile("-<a .*?>(.*?)</a><a .*?>(.*?)</a>");
+    //-<a href="/chengjiao/tianhe/">天河</a><a href="/chengjiao/chebei/">车陂</a>
+
+
+    public static House getAndGenChengjiaoHouseObject(String houseUrl,String houseHtml) {
+
+        String reg = ">\\s+([^\\s<]*)\\s+<";
+        houseHtml = houseHtml.replaceAll(reg, ">$1<");
+
+        House house = new House(houseUrl);
+        house.setHtml(houseHtml);
+
+        matcher = chengjiaoTitlePattern.matcher(houseHtml);
+        if (matcher.find()) {
+            house.setTitle(matcher.group(1));
+        }
+
+        matcher = chengjiaoPrice.matcher(houseHtml);
+        if (matcher.find()) {
+            house.setChengjiaoPrice(new BigDecimal((matcher.group(1))));
+        }
+
+        matcher = t1.matcher(houseHtml);
+        if (matcher.find()) {
+            house.setRoomMainInfo(matcher.group(1));
+            String temp = matcher.group(2);
+            house.setRoomSubInfo(temp.replace("(","/").replace(")",""));
+        }
+
+        matcher = t2.matcher(houseHtml);
+        if (matcher.find()) {
+            house.setRoomMainType(matcher.group(1));
+        }
+
+        matcher = t3.matcher(houseHtml);
+        if (matcher.find()) {
+            house.setAreaMainInfo(matcher.group(1));
+            house.setAreaSubInfo(matcher.group(2));
+        }
+
+        matcher = t4.matcher(houseHtml);
+        if (matcher.find()) {
+            house.setAreaName(matcher.group(1)+" "+matcher.group(2));
+
+        }
+
+        return house;
+    }
 
     /**
      * 二手房首页
@@ -110,6 +170,17 @@ public abstract class LianjiaWebUtil {
         return 0;
     }
 
+    public static int fetchAreaChenjiaoTotalPageNo(String area){
+        String pageUrl = firstChenjiaoPageAreasUrl.replace("${area}", area);
+        String result = MyHttpClient.get(pageUrl);
+        Matcher matcher = totalPageNoInPageWebPattern.matcher(result);
+        while (matcher.find()) {
+            return Integer.parseInt(matcher.group(1));
+        }
+        return 0;
+    }
+
+
     public static Set<String> fetchAreaHouseUrls(String area, int pageNo) {
 
         Set<String> urls = new HashSet<>();
@@ -131,6 +202,31 @@ public abstract class LianjiaWebUtil {
                 //logger.info(fangUrl);
                 urls.add(fangUrl);
             }
+        logger.info("area=" + area + " size : "+urls.size());
+        return urls;
+    }
+
+    public static Set<String> fetchAreaChenjiaoHouseUrls(String area, int pageNo) {
+
+        Set<String> urls = new HashSet<>();
+
+        logger.info("start fetching chengjiao area=" + area + ",pageNo="+pageNo);
+        String pageUrl = null;
+
+        String result = "";
+        if (pageNo == 1) {
+            pageUrl = firstChenjiaoPageAreasUrl.replace("${area}", area);
+            result = MyHttpClient.get(pageUrl);
+        } else {
+            pageUrl = chengjiaoPageAreasUrl.replace("${area}", area).replace("${pageNo}", pageNo + "");
+            result = MyHttpClient.get(pageUrl);
+        }
+        Matcher matcher = chengjiaoHouseUrlInPageWebPattern.matcher(result);
+        while (matcher.find()) {
+            String fangUrl = matcher.group();
+            //logger.info(fangUrl);
+            urls.add(fangUrl);
+        }
         logger.info("area=" + area + " size : "+urls.size());
         return urls;
     }
@@ -195,6 +291,9 @@ public abstract class LianjiaWebUtil {
 
     public static House getAndGenHouseObject(String houseUrl,String houseHtml) {
 
+        if(houseUrl.indexOf("chengjiao")>-1)
+            return getAndGenChengjiaoHouseObject(houseUrl, houseHtml);
+
         String reg = ">\\s+([^\\s<]*)\\s+<";
         houseHtml = houseHtml.replaceAll(reg, ">$1<");
 
@@ -252,7 +351,6 @@ public abstract class LianjiaWebUtil {
             house.setRoomMainType(matcher.group(1));
             house.setRoomSubType(matcher.group(2));
         }
-
 
         matcher = areaMainAndSubInfoPattern.matcher(houseHtml);
         if(matcher.find()) {
@@ -444,12 +542,14 @@ public abstract class LianjiaWebUtil {
 
         String url ="http://gz.lianjia.com/ershoufang/";
         String url2 = "http://gz.lianjia.com/ershoufang/GZ0002180546.html";
-        String url3 = "http://gz.lianjia.com/ershoufang/GZ0001565595.html";
+        String url3 = "http://gz.lianjia.com/chengjiao/GZ0002008482.html";
 
 
+        House house = LianjiaWebUtil.fetchAndGenHouseObject(url3);
 
-
-        ///////////////////////////////////////
+        if(StringUtils.isEmpty(house.getTitle())|| StringUtils.isBlank(house.getTitle())){
+            System.out.println(111);
+        }
 
 
 

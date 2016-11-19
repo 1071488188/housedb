@@ -30,7 +30,9 @@ public interface HouseindexService{
 
 	Page<Houseindex> page(int pageNo, int pageSize);
 
-	List<Houseindex> pageTodayUnCheck(int start, int step);
+	List<Houseindex> listTodayUnCheck(int start, int step);
+
+	List<Houseindex> listTodayHasNotDetail(int start, int step);
 
 	void setTodayChecked(String code);
 

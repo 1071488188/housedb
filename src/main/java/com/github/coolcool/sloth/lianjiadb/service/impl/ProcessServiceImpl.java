@@ -56,54 +56,111 @@ public  class ProcessServiceImpl implements ProcessService{
 			if(process.getFinished()>0){
 				continue;
 			}
-			int totalPageNo = LianjiaWebUtil.fetchAreaTotalPageNo(process.getArea());
-			logger.info(process.getArea()+" total pageno is "+totalPageNo);
-			if(totalPageNo==0){
-				process.setPageNo(0);
-				process.setFinished(1);
-				process.setFinishtime(new Date());
-				this.update(process);
-				continue;
-			}
-
-			while(process.getPageNo()<=totalPageNo && process.getFinished()==0){
-				Set<String> urls = LianjiaWebUtil.fetchAreaHouseUrls(process.getArea(), process.getPageNo());
-				Iterator<String> iurl = urls.iterator();
-				while (iurl.hasNext()){
-					String houseUrl = iurl.next();
-					Houseindex houseindex = new Houseindex(houseUrl);
-					houseindex.setUpdatetime(new Date());
-					houseindex.setLastCheckDate(null);
-					houseindex.setStatus(1);
-
-					Houseindex tempHouseIndex = houseindexService.getByCode(houseindex.getCode());
-					if(tempHouseIndex!=null){
-						if(tempHouseIndex.getStatus()>0)
-							continue;
-						else{
-							houseindexService.update(houseindex);
-							logger.info("changed house index :"+JSONObject.toJSONString(houseindex));
-						}
-					}else {
-						//insert to db
-						houseindexService.save(houseindex);
-						logger.info("saved house index : "+JSONObject.toJSONString(houseindex));
-					}
-				}
-
-				if(process.getPageNo()==totalPageNo){
+			//在售房源抓取
+			if(process.getType()==1){
+				int totalPageNo = LianjiaWebUtil.fetchAreaTotalPageNo(process.getArea());
+				logger.info(process.getArea()+" total pageno is "+totalPageNo);
+				if(totalPageNo==0){
+					process.setPageNo(0);
 					process.setFinished(1);
 					process.setFinishtime(new Date());
-				}else{
-					process.setPageNo(process.getPageNo()+1);
+					this.update(process);
+					continue;
 				}
-				//insert to db
-				this.update(process);
-				process.setPageNo(process.getPageNo()+1);
-				try {
-					Thread.sleep(500);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+
+				while(process.getPageNo()<=totalPageNo && process.getFinished()==0){
+					Set<String> urls = LianjiaWebUtil.fetchAreaHouseUrls(process.getArea(), process.getPageNo());
+					Iterator<String> iurl = urls.iterator();
+					while (iurl.hasNext()){
+						String houseUrl = iurl.next();
+						Houseindex houseindex = new Houseindex(houseUrl);
+						Houseindex tempHouseIndex = houseindexService.getByCode(houseindex.getCode());
+						if(tempHouseIndex!=null){
+							if(tempHouseIndex.getStatus()==1)
+								continue;
+							else{
+								houseindex.setStatus(1);//设置为在售
+								houseindex.setUpdatetime(new Date());
+								houseindexService.update(houseindex);
+								logger.info("changed selling house index :"+JSONObject.toJSONString(houseindex));
+							}
+						}else {
+							//insert to db
+							houseindex.setStatus(1);//设置为在售
+							houseindex.setUpdatetime(new Date());
+							houseindexService.save(houseindex);
+							logger.info("saved selling house index : "+JSONObject.toJSONString(houseindex));
+						}
+					}
+
+					if(process.getPageNo()==totalPageNo){
+						process.setFinished(1);
+						process.setFinishtime(new Date());
+					}else{
+						process.setPageNo(process.getPageNo()+1);
+					}
+					//insert to db
+					this.update(process);
+					process.setPageNo(process.getPageNo()+1);
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			//已经成交房源抓取
+			else if(process.getType()==2){
+				int totalPageNo = LianjiaWebUtil.fetchAreaChenjiaoTotalPageNo(process.getArea());
+				logger.info(process.getArea()+" chengjiao total pageno is "+totalPageNo);
+				if(totalPageNo==0){
+					process.setPageNo(0);
+					process.setFinished(1);
+					process.setFinishtime(new Date());
+					this.update(process);
+					continue;
+				}
+
+				while(process.getPageNo()<=totalPageNo && process.getFinished()==0){
+					Set<String> urls = LianjiaWebUtil.fetchAreaChenjiaoHouseUrls(process.getArea(), process.getPageNo());
+
+					Iterator<String> iurl = urls.iterator();
+					while (iurl.hasNext()){
+						String houseUrl = iurl.next();
+						Houseindex houseindex = new Houseindex(houseUrl);
+						Houseindex tempHouseIndex = houseindexService.getByCode(houseindex.getCode());
+						if(tempHouseIndex!=null){
+							if(tempHouseIndex.getStatus()==2)
+								continue;
+							else{
+								houseindex.setUpdatetime(new Date());
+								houseindex.setStatus(2);//设置为已成交
+								houseindexService.update(houseindex);
+								logger.info("changed sold house index :"+JSONObject.toJSONString(houseindex));
+							}
+						}else {
+							//insert to db
+							houseindex.setUpdatetime(new Date());
+							houseindex.setStatus(2);//设置为已成交
+							houseindexService.save(houseindex);
+							logger.info("saved sold house index : "+JSONObject.toJSONString(houseindex));
+						}
+					}
+
+					if(process.getPageNo()==totalPageNo){
+						process.setFinished(1);
+						process.setFinishtime(new Date());
+					}else{
+						process.setPageNo(process.getPageNo()+1);
+					}
+					//insert to db
+					this.update(process);
+					process.setPageNo(process.getPageNo()+1);
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		}
@@ -116,28 +173,42 @@ public  class ProcessServiceImpl implements ProcessService{
 		int pageSize = 300;
 		boolean stop = false;
 		while (!stop) {
-			//状态为 0
-			Page<Houseindex> houseindexPage = houseindexService.page(pageNo, pageSize);
-			if(houseindexPage==null || houseindexPage.getResult()==null || houseindexPage.getResult().size()==0)
+			//分页获取 hasDetail 状态为 0  的 houseindex
+			List<Houseindex> houseindexList = houseindexService.listTodayHasNotDetail(pageNo, pageSize);
+			if(houseindexList==null ||  houseindexList.size()==0)
 				break;
-			List<Houseindex> houseindexList = houseindexPage.getResult();
 			//fetch detail
 			for (int i = 0; i < houseindexList.size(); i++) {
 				Houseindex h = houseindexList.get(i);
 				House house = LianjiaWebUtil.fetchAndGenHouseObject(h.getUrl());
 
 				if(StringUtils.isEmpty(house.getTitle())|| StringUtils.isBlank(house.getTitle())){
-					logger .warn("house title is null "+JSONObject.toJSONString(house));
+					logger .info("house title is null "+JSONObject.toJSONString(house));
 					h.setStatus(-2);
 					h.setUpdatetime(new Date());
+					h.setHasdetail(1);
 					houseindexService.update(h);
 				}else{
-					//insert into db
-					houseService.save(house);
-					h.setStatus(1);
-					h.setUpdatetime(new Date());
-					houseindexService.update(h);
-					logger.info("saving house:"+ JSONObject.toJSONString(house));
+
+					if(h.getStatus()==1){
+						//insert into db
+						houseService.save(house);
+						h.setStatus(1);
+						h.setUpdatetime(new Date());
+						h.setHasdetail(1);
+						houseindexService.update(h);
+						logger.info("saving selling house:"+ JSONObject.toJSONString(house));
+					}else{
+						//insert into db
+						houseService.save(house);
+						h.setStatus(2);
+						h.setUpdatetime(new Date());
+						h.setHasdetail(1);
+						houseindexService.update(h);
+						logger.info("saving sold house:"+ JSONObject.toJSONString(house));
+					}
+
+
 				}
 
 				try {
@@ -158,7 +229,7 @@ public  class ProcessServiceImpl implements ProcessService{
 
 		while (true) {
 			//分页获取今天需要被检测的houseIndex
-			List<Houseindex> houseindexList = houseindexService.pageTodayUnCheck(start, step);
+			List<Houseindex> houseindexList = houseindexService.listTodayUnCheck(start, step);
 
 			logger.info("checking price ..."+houseindexList.size());
 
@@ -178,7 +249,7 @@ public  class ProcessServiceImpl implements ProcessService{
 				if("error".equals(houseHtml)){
 					//商品页面找不到，永久重定向
 					logger.info("house is not found, "+JSONObject.toJSONString(houseindex));
-					houseindex.setStatus(-301); //已下架
+					houseindex.setStatus(-301); //找不到
 					houseindexService.update(houseindex);
 					houseindex.setLastCheckDate(new Date());
 					continue;
@@ -307,9 +378,17 @@ public  class ProcessServiceImpl implements ProcessService{
 			Process process = new Process();
 			process.setPageNo(0);
 			process.setArea(area.getCode());
+			process.setType(1);
 			process.setFinished(0);
 			save(process);
+			Process process2 = new Process();
+			process2.setPageNo(0);
+			process2.setArea(area.getCode());
+			process2.setType(2);
+			process2.setFinished(0);
+			save(process2);
 			logger.info("add  process "+ JSONObject.toJSONString(process));
+			logger.info("add  process2 "+ JSONObject.toJSONString(process2));
 		}
 	}
 

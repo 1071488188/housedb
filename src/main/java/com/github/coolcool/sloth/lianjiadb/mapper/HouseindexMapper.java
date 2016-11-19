@@ -29,7 +29,7 @@ public interface HouseindexMapper{
 	Integer deleteByPrimaryKey(@Param("primaryKey") Object primaryKey);
 
 	@Update({
-		"UPDATE houseindex SET id=#{id}, code=#{code}, url=#{url}, status=#{status}, updatetime=#{updatetime},lastCheckDate=#{lastCheckDate}  where id = #{id}"
+		"UPDATE houseindex SET id=#{id}, code=#{code}, url=#{url}, status=#{status}, updatetime=#{updatetime},lastCheckDate=#{lastCheckDate}, hasdetail=#{hasdetail}  where id = #{id}"
 	})
 	Integer updateByPrimaryKey(Houseindex houseindex);
 
@@ -48,7 +48,10 @@ public interface HouseindexMapper{
 	List<Houseindex> page(@Param("start") int start, @Param("step") int step);
 
 	@Select("SELECT * FROM houseindex where status>0 and (lastcheckdate is null or lastcheckdate < curdate() )  LIMIT #{start}, #{step}")
-	List<Houseindex> pageTodayUnCheck(@Param("start") int start, @Param("step") int step);
+	List<Houseindex> listTodayUnCheck(@Param("start") int start, @Param("step") int step);
+
+	@Select("SELECT * FROM houseindex where hasdetail=0 LIMIT #{start}, #{step}")
+	List<Houseindex> listTodayHasNotDetail(@Param("start") int start, @Param("step") int step);
 
 	@Update({
 			"UPDATE houseindex SET lastcheckdate = curdate() where code = #{code}"

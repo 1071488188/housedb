@@ -27,6 +27,11 @@ public class Process {
 	   
 	 */
 	private Integer finished=0;
+
+	/**
+	 * 1:在售房源任务类别; 2:已成交房源任务类别
+	 */
+	private Integer type=0;
 	/**
 	   
 	 */
@@ -77,5 +82,13 @@ public class Process {
 
 	public void setFinishtime(java.util.Date finishtime) {
 		this.finishtime = finishtime;
-	} 
+	}
+
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
+	}
 }

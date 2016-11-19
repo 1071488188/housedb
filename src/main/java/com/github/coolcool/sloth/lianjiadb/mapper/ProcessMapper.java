@@ -30,8 +30,8 @@ public interface ProcessMapper{
 	Integer updateByPrimaryKey(Process process);
 
 	@Insert({
-		"INSERT INTO process (area, pageNo, finished, createtime)",
-		"VALUE (#{area}, #{pageNo}, #{finished}, curdate()) ON DUPLICATE KEY UPDATE area=#{area}"
+		"INSERT INTO process (area, pageNo, finished, type, createtime)",
+		"VALUE (#{area}, #{pageNo}, #{finished}, #{type},curdate()) ON DUPLICATE KEY UPDATE area=#{area}"
 	})
 	Integer insert(Process process);
 

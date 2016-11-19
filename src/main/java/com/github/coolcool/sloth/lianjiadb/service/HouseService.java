@@ -27,5 +27,7 @@ public interface HouseService{
 
 	Page<House> page(int pageNo, int pageSize);
 
+	Page<House> pageToday(int pageNo, int pageSize);
+
 	Integer increment();
 }

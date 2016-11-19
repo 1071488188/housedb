@@ -14,6 +14,9 @@ import javax.annotation.Generated;
 public interface ProcessService{
 
 
+	/**
+	 * 获取在售房源和已经成交的房源链接地址
+	 */
 	void fetchHouseUrls();
 
 	void fetchHouseDetail();

@@ -72,9 +72,15 @@ public  class HouseindexServiceImpl implements HouseindexService{
 	}
 
 	@Override
-	public List<Houseindex> pageTodayUnCheck(int start, int step) {
-		return houseindexMapper.pageTodayUnCheck(start,step);
+	public List<Houseindex> listTodayUnCheck(int start, int step) {
+		return houseindexMapper.listTodayUnCheck(start,step);
 	}
+
+	@Override
+	public List<Houseindex> listTodayHasNotDetail(int start, int step) {
+		return houseindexMapper.listTodayHasNotDetail(start,step);
+	}
+
 
 	@Override
 	public void setTodayChecked(String code) {

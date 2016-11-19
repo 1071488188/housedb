@@ -36,7 +36,7 @@ public class Houseindex {
 	 */
 	private String url;
 	/**
-	   
+	 * 0:未处理；1:在售；2:已成交；-1:已经下架；-2：信息异常；-301：找不到
 	 */
 	private Integer status;
 	/**
@@ -49,6 +49,8 @@ public class Houseindex {
 	private java.util.Date updatetime;
 
 	private java.util.Date lastCheckDate;
+
+	private int hasdetail;
 
 	public Long getId() {
 		return id;
@@ -99,5 +101,13 @@ public class Houseindex {
 
 	public void setLastCheckDate(Date lastCheckDate) {
 		this.lastCheckDate = lastCheckDate;
+	}
+
+	public int getHasdetail() {
+		return hasdetail;
+	}
+
+	public void setHasdetail(int hasdetail) {
+		this.hasdetail = hasdetail;
 	}
 }

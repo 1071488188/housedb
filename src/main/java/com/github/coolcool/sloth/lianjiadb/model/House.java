@@ -4,6 +4,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.annotation.Generated;
+import java.math.BigDecimal;
 
 @Generated(
 	value = {
@@ -41,11 +42,11 @@ public class House {
 	/**
 	   
 	 */
-	private Integer favcount;
+	private Integer favcount = 0 ;
 	/**
 	   
 	 */
-	private Integer cartcount;
+	private Integer cartcount = 0;
 	/**
 	   
 	 */
@@ -235,6 +236,8 @@ public class House {
 	private  String html;
 
 	private  double roomSize;
+
+	private java.math.BigDecimal chengjiaoPrice;
 
 
 	public Long getId() {
@@ -623,5 +626,13 @@ public class House {
 
 	public void setRoomSize(double roomSize) {
 		this.roomSize = roomSize;
+	}
+
+	public BigDecimal getChengjiaoPrice() {
+		return chengjiaoPrice;
+	}
+
+	public void setChengjiaoPrice(BigDecimal chengjiaoPrice) {
+		this.chengjiaoPrice = chengjiaoPrice;
 	}
 }
