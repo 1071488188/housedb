@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import com.github.coolcool.sloth.lianjiadb.mapper.ProcessMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.github.coolcool.sloth.lianjiadb.common.Page;
 import javax.annotation.Generated;
@@ -46,6 +47,9 @@ public  class ProcessServiceImpl implements ProcessService{
 
 	@Autowired
 	private ProcessMapper processMapper;
+
+	@Value("${com.github.coolcool.sloth.lianjiadb.timetask.GenAndExeDailyProcessTimeTask.notifyAreas:}")
+	String notifyAreas;
 
 
 	@Override
@@ -90,6 +94,28 @@ public  class ProcessServiceImpl implements ProcessService{
 							houseindex.setUpdatetime(new Date());
 							houseindexService.save(houseindex);
 							logger.info("saved selling house index : "+JSONObject.toJSONString(houseindex));
+							//是否需要通知
+							if( !StringUtils.isEmpty(notifyAreas) && notifyAreas.indexOf(","+process.getArea()+",")>-1){
+								//邮件通知价格变动
+								String subject = "【新房源上线通知】".concat("万").concat(houseindex.getCode());
+								House nowhouse = LianjiaWebUtil.fetchAndGenHouseObject(houseindex.getUrl());
+								String content = "<br/>" +
+										nowhouse.getTitle()+"<br/>" +
+										nowhouse.getSubtitle()+"<br/>" +
+										"【地址】："+nowhouse.getAreaName()+"<br/>" +
+										"【价格】："+nowhouse.getPrice()+"万 <br/>" +
+										"【均价】："+nowhouse.getUnitprice()+"万 <br/>" +
+										"【面积】："+nowhouse.getAreaMainInfo() +"<br/>" +
+										"【楼龄】："+nowhouse.getAreaSubInfo() +"<br/>" +
+										"【室厅】："+nowhouse.getRoomMainInfo() +"<br/>" +
+										"【楼层】："+nowhouse.getRoomSubInfo() +"<br/>" +
+										"【朝向】："+nowhouse.getRoomMainType() +"<br/>" +
+										"【装修】："+nowhouse.getRoomSubType()+"<br/>" +
+										"【源地址】：<a href=\""+houseindex.getUrl()+"\">"+houseindex.getUrl()+"</a>"+
+										"";
+								MailUtil.send(subject, content);
+							}
+
 						}
 					}
 
