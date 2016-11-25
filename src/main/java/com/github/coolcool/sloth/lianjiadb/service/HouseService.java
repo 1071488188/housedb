@@ -19,6 +19,8 @@ public interface HouseService{
 
 	House getById(Object id);
 
+	House getByCode(String code);
+
 	void deleteById(Object id);
 
 	void update(House house);

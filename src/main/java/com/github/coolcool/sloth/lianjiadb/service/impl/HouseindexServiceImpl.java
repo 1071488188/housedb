@@ -72,6 +72,13 @@ public  class HouseindexServiceImpl implements HouseindexService{
 	}
 
 	@Override
+	public List<Houseindex> listToday(int pageNo, int pageSize){
+		int start = (pageNo-1)*pageSize;
+		return houseindexMapper.listToday(start,pageSize);
+	}
+
+
+	@Override
 	public List<Houseindex> listTodayUnCheck(int start, int step) {
 		return houseindexMapper.listTodayUnCheck(start,step);
 	}

@@ -47,6 +47,10 @@ public interface HouseindexMapper{
 	@Select("SELECT * FROM houseindex where status=0 LIMIT #{start}, #{step}")
 	List<Houseindex> page(@Param("start") int start, @Param("step") int step);
 
+	@Select("SELECT * FROM houseindex where TO_DAYS(createtime) = TO_DAYS(curdate()) LIMIT #{start}, #{step}")
+	List<Houseindex> listToday(@Param("start") int start, @Param("step") int step);
+
+
 	@Select("SELECT * FROM houseindex where status>0 and (lastcheckdate is null or lastcheckdate < curdate() )  LIMIT #{start}, #{step}")
 	List<Houseindex> listTodayUnCheck(@Param("start") int start, @Param("step") int step);
 

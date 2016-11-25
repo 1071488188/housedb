@@ -35,6 +35,12 @@ public  class HouseServiceImpl implements HouseService{
 	public House getById(Object id){
 		return houseMapper.getByPrimaryKey(id);
 	}
+
+	@Override
+	public House getByCode(String code){
+		return houseMapper.getByCode(code);
+	}
+
 	@Override
 	public void deleteById(Object id){
 		houseMapper.deleteByPrimaryKey(id);

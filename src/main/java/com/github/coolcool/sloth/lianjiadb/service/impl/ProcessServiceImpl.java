@@ -133,17 +133,18 @@ public  class ProcessServiceImpl implements ProcessService{
 							if(tempHouseIndex.getStatus()==2)
 								continue;
 							else{
-								houseindex.setUpdatetime(new Date());
-								houseindex.setStatus(2);//设置为已成交
-								houseindexService.update(houseindex);
-								logger.info("changed sold house index :"+JSONObject.toJSONString(houseindex));
+								tempHouseIndex.setUpdatetime(new Date());
+								tempHouseIndex.setStatus(2);//设置为已成交
+								houseindexService.update(tempHouseIndex);
+								logger.info("changed sold houseindex :"+JSONObject.toJSONString(houseindex));
 							}
 						}else {
 							//insert to db
+							houseindex.setCreatetime(new Date());
 							houseindex.setUpdatetime(new Date());
 							houseindex.setStatus(2);//设置为已成交
 							houseindexService.save(houseindex);
-							logger.info("saved sold house index : "+JSONObject.toJSONString(houseindex));
+							logger.info("saved sold houseindex : "+JSONObject.toJSONString(houseindex));
 						}
 					}
 

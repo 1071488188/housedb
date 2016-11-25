@@ -20,6 +20,9 @@ public interface HouseMapper{
 	@Select("SELECT * FROM house WHERE id = #{primaryKey} LIMIT 1 ")
 	House getByPrimaryKey(@Param("primaryKey") Object primaryKey);
 
+	@Select("SELECT * FROM house WHERE code=#{code} LIMIT 1 ")
+	House getByCode(@Param("code") String code);
+
 
 	@Delete("DELETE FROM house WHERE id = #{primaryKey} ")
 	Integer deleteByPrimaryKey(@Param("primaryKey") Object primaryKey);
