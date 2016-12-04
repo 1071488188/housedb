@@ -32,15 +32,14 @@ public class CheckHttpProxyTimeTask extends TimerTask {
                 for (int i = 0; i < httpProxyConfigs.size(); i++) {
                     MyHttpClient.HttpProxyConfig httpProxyConfig = httpProxyConfigs.get(i);
                     String result = MyHttpClient.get(testurl,httpProxyConfig);
-                    if(result.indexOf("验证异常流量")<0){
-                        httpProxyConfig.setStatus(1);
-                        //log.info("proxyok:"+JSONObject.toJSONString(httpProxyConfig));
-                        MyHttpClient.addAvailableHttpProxyConfig(httpProxyConfig);
-
-                    }else{
+                    if("error".equals(result) || result.indexOf("验证异常流量")>-1){
                         httpProxyConfig.setStatus(0);
                         //log.info("proxyerror:"+ JSONObject.toJSONString(httpProxyConfig));
                         MyHttpClient.removeAvailableHttpProxyConfig(httpProxyConfig);
+                    }else {
+                        httpProxyConfig.setStatus(1);
+                        //log.info("proxyok:"+JSONObject.toJSONString(httpProxyConfig));
+                        MyHttpClient.addAvailableHttpProxyConfig(httpProxyConfig);
                     }
                 }
             }catch (Throwable t){

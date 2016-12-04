@@ -5,7 +5,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.github.coolcool.sloth.lianjiadb.common.MyHttpClient;
-import com.github.coolcool.sloth.lianjiadb.common.Util;
 import com.github.coolcool.sloth.lianjiadb.mapper.AreaMapper;
 import com.github.coolcool.sloth.lianjiadb.model.Area;
 import com.github.coolcool.sloth.lianjiadb.model.House;

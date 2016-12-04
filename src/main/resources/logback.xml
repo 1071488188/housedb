@@ -72,7 +72,7 @@
 		<appender-ref ref="LOGSTASH" />
 	</logger>
 
-	<root level="INFO">
+	<root level="DEBUG">
 		<appender-ref ref="CONSOLE" />
 		<appender-ref ref="FILE_ALL_APPENDER" />
 		<appender-ref ref="FILE_ERROR_APPENDER" />

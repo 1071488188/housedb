@@ -1,19 +1,12 @@
 package com.github.coolcool.sloth.lianjiadb.service.impl.support;
 
-import com.alibaba.fastjson.JSONObject;
 import com.github.coolcool.sloth.lianjiadb.common.MyHttpClient;
-import com.github.coolcool.sloth.lianjiadb.common.Util;
 import com.github.coolcool.sloth.lianjiadb.model.House;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.net.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

@@ -42,7 +42,7 @@ public abstract class MyHttpClient {
         available = true;
         logger.info("set myhttpclient available....");
         availableHttpProxyConfigs.add(httpProxyConfig);
-        logger.info("add availableHttpProxyConfigs :"+JSONObject.toJSONString(httpProxyConfig));
+        logger.info("add available HttpProxyConfigs :"+JSONObject.toJSONString(httpProxyConfig));
     }
 
     public static void removeAvailableHttpProxyConfig(HttpProxyConfig httpProxyConfig){
@@ -50,7 +50,7 @@ public abstract class MyHttpClient {
             HttpProxyConfig temp = availableHttpProxyConfigs.get(i);
             if(temp.getId()==httpProxyConfig.getId()){
                 availableHttpProxyConfigs.remove(i);
-                logger.info("remove availableHttpProxyConfigs :"+JSONObject.toJSONString(httpProxyConfig));
+                logger.info("remove available HttpProxyConfigs :"+JSONObject.toJSONString(httpProxyConfig));
             }
         }
         if (availableHttpProxyConfigs.size()==0) {
@@ -242,10 +242,12 @@ public abstract class MyHttpClient {
         String url3 = "http://gz.lianjia.com/ershoufang/GZ0001565595.html";
         HttpProxyConfig httpProxyConfig = new HttpProxyConfig(2,"182.84.98.173",808,"te1101","te1101");
         String result = get(url2,httpProxyConfig);
-        if(result.indexOf("验证异常流量")<0){
-            logger.info("OK");
-        }else {
+        if(result.indexOf("验证异常流量")>-1){
             logger.info("er");
+        }else if ("error".equals(result)){
+            logger.info("er");
+        }else {
+            logger.info("OK");
         }
     }
 

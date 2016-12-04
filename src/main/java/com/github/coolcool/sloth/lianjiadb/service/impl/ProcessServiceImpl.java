@@ -96,9 +96,9 @@ public  class ProcessServiceImpl implements ProcessService{
 							logger.info("saved selling house index : "+JSONObject.toJSONString(houseindex));
 							//是否需要通知
 							if( !StringUtils.isEmpty(notifyAreas) && notifyAreas.indexOf(","+process.getArea()+",")>-1){
-								//邮件通知价格变动
-								String subject = "【新房源上线通知】".concat("万").concat(houseindex.getCode());
 								House nowhouse = LianjiaWebUtil.fetchAndGenHouseObject(houseindex.getUrl());
+								//邮件通知价格变动
+								String subject = "【新房源上线通知】".concat(nowhouse.getAreaName()).concat(houseindex.getCode());
 								String content = "<br/>" +
 										nowhouse.getTitle()+"<br/>" +
 										nowhouse.getSubtitle()+"<br/>" +
