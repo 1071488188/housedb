@@ -29,10 +29,10 @@ public class CheckChangingTimeTask extends TimerTask {
     static boolean running = false;
 
     @Override
-    @Scheduled(cron="0 0 9 * * ?")   // 每天9点执行一次
+    @Scheduled(cron="0 0/10 * * * ?")
     public void run() {
 
-        if(LocalTime.now().getHour() != checkchangingHour)
+        if(LocalTime.now().getHour() != checkchangingHour) // 每天9点执行一次
             return;
 
         if(MyHttpClient.available && !running){

@@ -30,13 +30,12 @@ public abstract class MyHttpClient {
 
     static {
         allHttpProxyConfigs.add(new HttpProxyConfig(1,"",0,"",""));
-        allHttpProxyConfigs.add(new HttpProxyConfig(2,"182.84.98.173",808,"te1101","te1101"));
     }
     
     public static void addAvailableHttpProxyConfig(HttpProxyConfig httpProxyConfig){
         for (int i = 0; i < availableHttpProxyConfigs.size(); i++) {
             HttpProxyConfig temp = availableHttpProxyConfigs.get(i);
-            if(temp.getId()==httpProxyConfig.getId())
+            if(temp.getHost().equals(httpProxyConfig.getHost()))
                 return ;
         }
         available = true;
@@ -168,6 +167,10 @@ public abstract class MyHttpClient {
         String password;
         int status=0; //0:暂停使用；1:使用中
         int type = 0;//0:http proxy; 1:socket proxy
+
+        public HttpProxyConfig(){
+
+        }
 
         public HttpProxyConfig(int id,String host, int port, String username, String password) {
             this.id = id;
