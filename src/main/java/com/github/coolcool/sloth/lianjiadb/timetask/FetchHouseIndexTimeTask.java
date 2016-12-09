@@ -26,7 +26,7 @@ public class FetchHouseIndexTimeTask extends TimerTask {
 
 
     @Override
-    @Scheduled(cron="0 0/5 * * * ?")   //每5分钟执行一次
+    @Scheduled(cron="0 0/1 * * * ?")   //每5分钟执行一次
     public void run() {
         if(MyHttpClient.available && !houseDetailFetching){
             houseDetailFetching = true;

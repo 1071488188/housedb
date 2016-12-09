@@ -53,7 +53,7 @@ public  class ProcessServiceImpl implements ProcessService{
 
 
 	@Override
-	public void fetchHouseUrls() {
+	public void fetchHouseUrls() throws InterruptedException {
 		List<Process> processes = processMapper.listUnFinished();
 		for (int i = 0; i < processes.size(); i++) {
 			Process process = processes.get(i);
@@ -63,6 +63,7 @@ public  class ProcessServiceImpl implements ProcessService{
 			//在售房源抓取
 			if(process.getType()==1){
 				int totalPageNo = LianjiaWebUtil.fetchAreaTotalPageNo(process.getArea());
+				Thread.sleep(500);
 				logger.info(process.getArea()+" total pageno is "+totalPageNo);
 				if(totalPageNo==0){
 					process.setPageNo(0);
@@ -74,6 +75,7 @@ public  class ProcessServiceImpl implements ProcessService{
 
 				while(process.getPageNo()<=totalPageNo && process.getFinished()==0){
 					Set<String> urls = LianjiaWebUtil.fetchAreaHouseUrls(process.getArea(), process.getPageNo());
+					Thread.sleep(500);
 					Iterator<String> iurl = urls.iterator();
 					while (iurl.hasNext()){
 						String houseUrl = iurl.next();
@@ -97,6 +99,7 @@ public  class ProcessServiceImpl implements ProcessService{
 							//是否需要通知
 							if( !StringUtils.isEmpty(notifyAreas) && notifyAreas.indexOf(","+process.getArea()+",")>-1){
 								House nowhouse = LianjiaWebUtil.fetchAndGenHouseObject(houseindex.getUrl());
+								Thread.sleep(500);
 								//邮件通知价格变动
 								String subject = "【新房源上线通知】".concat(nowhouse.getAreaName()).concat(houseindex.getCode());
 								String content = "<br/>" +
@@ -138,6 +141,7 @@ public  class ProcessServiceImpl implements ProcessService{
 			//已经成交房源抓取
 			else if(process.getType()==2){
 				int totalPageNo = LianjiaWebUtil.fetchAreaChenjiaoTotalPageNo(process.getArea());
+				Thread.sleep(500);
 				logger.info(process.getArea()+" chengjiao total pageno is "+totalPageNo);
 				if(totalPageNo==0){
 					process.setPageNo(0);
@@ -149,6 +153,7 @@ public  class ProcessServiceImpl implements ProcessService{
 
 				while(process.getPageNo()<=totalPageNo && process.getFinished()==0){
 					Set<String> urls = LianjiaWebUtil.fetchAreaChenjiaoHouseUrls(process.getArea(), process.getPageNo());
+					Thread.sleep(500);
 
 					Iterator<String> iurl = urls.iterator();
 					while (iurl.hasNext()){
@@ -195,7 +200,7 @@ public  class ProcessServiceImpl implements ProcessService{
 
 
 	@Override
-	public void fetchHouseDetail() {
+	public void fetchHouseDetail() throws InterruptedException {
 		int pageNo = 1;
 		int pageSize = 300;
 		boolean stop = false;
@@ -208,7 +213,7 @@ public  class ProcessServiceImpl implements ProcessService{
 			for (int i = 0; i < houseindexList.size(); i++) {
 				Houseindex h = houseindexList.get(i);
 				House house = LianjiaWebUtil.fetchAndGenHouseObject(h.getUrl());
-
+				Thread.sleep(500);
 				if(StringUtils.isEmpty(house.getTitle())|| StringUtils.isBlank(house.getTitle())){
 					logger .info("house title is null "+JSONObject.toJSONString(house));
 					h.setStatus(-2);
@@ -234,14 +239,6 @@ public  class ProcessServiceImpl implements ProcessService{
 						houseindexService.update(h);
 						logger.info("saving sold house:"+ JSONObject.toJSONString(house));
 					}
-
-
-				}
-
-				try {
-					Thread.sleep(1500);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
 				}
 			}
 		}
@@ -249,7 +246,7 @@ public  class ProcessServiceImpl implements ProcessService{
 	}
 
 	@Override
-	public void checkChange() {
+	public void checkChange() throws InterruptedException {
 		//遍历house，检查价格变化、下架
 		int start = 0 ;
 		int step = 300;
@@ -273,6 +270,7 @@ public  class ProcessServiceImpl implements ProcessService{
 
 				Houseindex houseindex = houseindexList.get(i);
 				String houseHtml = LianjiaWebUtil.fetchHouseHtml(houseindex.getUrl());
+				Thread.sleep(500);
 				if("error".equals(houseHtml)){
 					//商品页面找不到，永久重定向
 					logger.info("house is not found, "+JSONObject.toJSONString(houseindex));

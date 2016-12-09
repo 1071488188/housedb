@@ -156,6 +156,9 @@ public abstract class LianjiaWebUtil {
     public static int fetchAreaTotalPageNo(String area){
         String pageUrl = firstPageAreasUrl.replace("${area}", area);
         String result = MyHttpClient.get(pageUrl);
+        if(StringUtils.isBlank(result)){
+            logger.warn("fetchAreaTotalPageNo error");
+        }
         Matcher matcher = totalPageNoInPageWebPattern.matcher(result);
         while (matcher.find()) {
             return Integer.parseInt(matcher.group(1));

@@ -17,11 +17,11 @@ public interface ProcessService{
 	/**
 	 * 获取在售房源和已经成交的房源链接地址
 	 */
-	void fetchHouseUrls();
+	void fetchHouseUrls() throws InterruptedException;
 
-	void fetchHouseDetail();
+	void fetchHouseDetail() throws InterruptedException;
 
-	void checkChange();
+	void checkChange() throws InterruptedException;
 
 
 	Integer save(Process process);
