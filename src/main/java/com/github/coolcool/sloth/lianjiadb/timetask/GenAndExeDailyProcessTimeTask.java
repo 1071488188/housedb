@@ -9,8 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalTime;
+import java.util.Calendar;
 import java.util.TimerTask;
 
 /**
@@ -29,8 +28,8 @@ public class GenAndExeDailyProcessTimeTask extends TimerTask {
     @Value("${com.github.coolcool.sloth.lianjiadb.timetask.genprocess.hour:8}")
     int genprocessHour;
 
-    static boolean genProcessing = false;
-    static boolean houseUrlsFetching = false;
+    @Value("${dev:false}")
+    boolean dev;
 
     @Override
     public void run() {
@@ -40,21 +39,20 @@ public class GenAndExeDailyProcessTimeTask extends TimerTask {
     /**
      * 生成当天任务
      */
-    @Scheduled(cron="0 0/5 * * * ?")
+    @Scheduled(cron="0 0/15 * * * ?")
     public void gen() {
-        //每天8点执行一次
-        if(LocalTime.now().getHour() != genprocessHour)
+        int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+
+        if(!dev && hour != genprocessHour)
             return;
 
-        if(MyHttpClient.available && !genProcessing){
-            genProcessing = true;
+        if(MyHttpClient.available){
             log.info("开始执行genProcessing...");
             try {
                 processService.genProcesses();
             }catch (Throwable t){
                 t.printStackTrace();
             }
-            genProcessing = false;
         }
     }
 
@@ -65,20 +63,15 @@ public class GenAndExeDailyProcessTimeTask extends TimerTask {
      */
     @Scheduled(cron="0 0/1 * * * ?")   //每5分钟执行一次
     public void exe() {
-        if(MyHttpClient.available && !houseUrlsFetching){
-            houseUrlsFetching = true;
+        if(MyHttpClient.available ){
             log.info("开始执行houseUrlsFetching...");
             try {
                 processService.fetchHouseUrls();
             }catch (Throwable t){
                 t.printStackTrace();
             }
-            houseUrlsFetching = false;
         }
     }
-
-
-
 
 
 }

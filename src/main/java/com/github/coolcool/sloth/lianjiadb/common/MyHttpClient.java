@@ -5,10 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,20 +22,21 @@ public abstract class MyHttpClient {
 
     public static  boolean available = false;
 
-    public static List<HttpProxyConfig> allHttpProxyConfigs = new ArrayList<>();
-    public static List<HttpProxyConfig> availableHttpProxyConfigs = new ArrayList<>();
+    public static List<HttpProxyConfig> allHttpProxyConfigs = new ArrayList<>();//所有的
+    public static List<HttpProxyConfig> availableHttpProxyConfigs = new ArrayList<>();//目前可用
 
     static {
-        allHttpProxyConfigs.add(new HttpProxyConfig(1,"",0,"",""));
+        allHttpProxyConfigs.add(new HttpProxyConfig("",0,"",""));
+        availableHttpProxyConfigs.add(new HttpProxyConfig("",0,"",""));
     }
     
     public static void addAvailableHttpProxyConfig(HttpProxyConfig httpProxyConfig){
+        available = true;
         for (int i = 0; i < availableHttpProxyConfigs.size(); i++) {
             HttpProxyConfig temp = availableHttpProxyConfigs.get(i);
             if(temp.getHost().equals(httpProxyConfig.getHost()))
                 return ;
         }
-        available = true;
         logger.info("set myhttpclient available....");
         availableHttpProxyConfigs.add(httpProxyConfig);
         logger.info("add available HttpProxyConfigs :"+JSONObject.toJSONString(httpProxyConfig));
@@ -47,7 +45,7 @@ public abstract class MyHttpClient {
     public static void removeAvailableHttpProxyConfig(HttpProxyConfig httpProxyConfig){
         for (int i = 0; i < availableHttpProxyConfigs.size(); i++) {
             HttpProxyConfig temp = availableHttpProxyConfigs.get(i);
-            if(temp.getId()==httpProxyConfig.getId()){
+            if(temp.getHost().equals(httpProxyConfig.getHost())){
                 availableHttpProxyConfigs.remove(i);
                 logger.info("remove available HttpProxyConfigs :"+JSONObject.toJSONString(httpProxyConfig));
             }
@@ -57,7 +55,6 @@ public abstract class MyHttpClient {
             logger.info("set myhttpclient not available....");
         }
     }
-
 
     public static String get(String url){
         return getByRandomProxy(url);
@@ -160,7 +157,6 @@ public abstract class MyHttpClient {
 
 
     public static class HttpProxyConfig {
-        int id;
         String host;
         int port;
         String username;
@@ -172,22 +168,13 @@ public abstract class MyHttpClient {
 
         }
 
-        public HttpProxyConfig(int id,String host, int port, String username, String password) {
-            this.id = id;
+        public HttpProxyConfig(String host, int port, String username, String password) {
             this.host = host;
             this.port = port;
             this.username = username;
             this.password = password;
             this.status=1;
             this.type = 0;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public void setId(int id) {
-            this.id = id;
         }
 
         public String getHost() {
@@ -239,18 +226,54 @@ public abstract class MyHttpClient {
         }
     }
 
+    public static void download(String urlString, String filename) throws Exception {
+
+        URL url = new URL(urlString); // 构造URL
+        URLConnection con = url.openConnection();  // 打开链接
+        con.setConnectTimeout(5*1000);  //设置请求超时为5s
+        InputStream is = con.getInputStream();  // 输入流
+        byte[] bs = new byte[1024];  // 1K的数据缓冲
+        int len;  // 读取到的数据长度
+        int i = filename.length();
+        for(i--;i>=0 && filename.charAt(i) != '\\' && filename.charAt(i) != '/';i--);
+        String s_dir = filename.substring(0, i);
+        File dir = new File(s_dir);  // 输出的文件流
+        if(!dir.exists()){
+            dir.mkdirs();
+        }
+        OutputStream os = new FileOutputStream(filename);
+        // 开始读取
+        while ((len = is.read(bs)) != -1) {
+            os.write(bs, 0, len);
+        }
+        // 完毕，关闭所有链接
+        os.close();
+        is.close();
+    }
+
+
+
+
+
     public static void main(String[] args) {
         String url ="http://gz.lianjia.com/ershoufang/";
         String url2 = "http://gz.lianjia.com/ershoufang/GZ0002180546.html";
         String url3 = "http://gz.lianjia.com/ershoufang/GZ0001565595.html";
-        HttpProxyConfig httpProxyConfig = new HttpProxyConfig(2,"182.84.98.173",808,"te1101","te1101");
+        HttpProxyConfig httpProxyConfig = new HttpProxyConfig("",0,"","");
+//        HttpProxyConfig httpProxyConfig = new HttpProxyConfig("123.59.12.81",10041,"","");
+//        HttpProxyConfig httpProxyConfig = new HttpProxyConfig("123.59.12.81",10041,"","");
+//        HttpProxyConfig httpProxyConfig = new HttpProxyConfig("123.59.12.81",10041,"","");
+//        HttpProxyConfig httpProxyConfig = new HttpProxyConfig("123.59.12.81",10041,"","");
+//        HttpProxyConfig httpProxyConfig = new HttpProxyConfig("123.59.12.81",10041,"","");
+//        HttpProxyConfig httpProxyConfig = new HttpProxyConfig("123.59.12.81",10041,"","");
         String result = get(url2,httpProxyConfig);
-        if(result.indexOf("验证异常流量")>-1){
+        if( (result.indexOf("验证异常流量")>-1) || (result.indexOf("ERROR.TIP_TITLE")>-1) ){
             logger.info("er");
         }else if ("error".equals(result)){
             logger.info("er");
         }else {
             logger.info("OK");
+            logger.info(result);
         }
     }
 

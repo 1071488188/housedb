@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalTime;
+import java.util.Calendar;
 import java.util.TimerTask;
 
 
@@ -19,6 +19,10 @@ import java.util.TimerTask;
 public class CheckChangingTimeTask extends TimerTask {
 
     private static final Logger log = LoggerFactory.getLogger(CheckChangingTimeTask.class);
+
+
+    @Value("${dev:false}")
+    boolean dev;
 
     @Value("${com.github.coolcool.sloth.lianjiadb.timetask.checkchanging.hour:9}")
     int checkchangingHour;
@@ -32,7 +36,9 @@ public class CheckChangingTimeTask extends TimerTask {
     @Scheduled(cron="0 0/10 * * * ?")
     public void run() {
 
-        if(LocalTime.now().getHour() != checkchangingHour) // 每天9点执行一次
+        int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+
+        if( hour != checkchangingHour && !dev) // 每天9点执行一次
             return;
 
         if(MyHttpClient.available && !running){

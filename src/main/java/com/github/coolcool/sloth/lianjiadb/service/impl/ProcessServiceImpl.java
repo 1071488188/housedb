@@ -75,7 +75,7 @@ public  class ProcessServiceImpl implements ProcessService{
 
 				while(process.getPageNo()<=totalPageNo && process.getFinished()==0){
 					Set<String> urls = LianjiaWebUtil.fetchAreaHouseUrls(process.getArea(), process.getPageNo());
-					Thread.sleep(500);
+					Thread.sleep(2000);
 					Iterator<String> iurl = urls.iterator();
 					while (iurl.hasNext()){
 						String houseUrl = iurl.next();
@@ -132,7 +132,8 @@ public  class ProcessServiceImpl implements ProcessService{
 					this.update(process);
 					process.setPageNo(process.getPageNo()+1);
 					try {
-						Thread.sleep(500);
+						Thread.sleep(2000);
+						logger.info("a sleep 2000");
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -141,7 +142,8 @@ public  class ProcessServiceImpl implements ProcessService{
 			//已经成交房源抓取
 			else if(process.getType()==2){
 				int totalPageNo = LianjiaWebUtil.fetchAreaChenjiaoTotalPageNo(process.getArea());
-				Thread.sleep(500);
+				Thread.sleep(2000);
+				logger.info("b sleep 2000");
 				logger.info(process.getArea()+" chengjiao total pageno is "+totalPageNo);
 				if(totalPageNo==0){
 					process.setPageNo(0);
@@ -153,8 +155,8 @@ public  class ProcessServiceImpl implements ProcessService{
 
 				while(process.getPageNo()<=totalPageNo && process.getFinished()==0){
 					Set<String> urls = LianjiaWebUtil.fetchAreaChenjiaoHouseUrls(process.getArea(), process.getPageNo());
-					Thread.sleep(500);
-
+					Thread.sleep(2000);
+					logger.info("c sleep 2000");
 					Iterator<String> iurl = urls.iterator();
 					while (iurl.hasNext()){
 						String houseUrl = iurl.next();
@@ -189,7 +191,8 @@ public  class ProcessServiceImpl implements ProcessService{
 					this.update(process);
 					process.setPageNo(process.getPageNo()+1);
 					try {
-						Thread.sleep(500);
+						Thread.sleep(2000);
+						logger.info("d sleep 2000");
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -213,7 +216,8 @@ public  class ProcessServiceImpl implements ProcessService{
 			for (int i = 0; i < houseindexList.size(); i++) {
 				Houseindex h = houseindexList.get(i);
 				House house = LianjiaWebUtil.fetchAndGenHouseObject(h.getUrl());
-				Thread.sleep(500);
+				Thread.sleep(2000);
+				logger.info("e sleep 2000");
 				if(StringUtils.isEmpty(house.getTitle())|| StringUtils.isBlank(house.getTitle())){
 					logger .info("house title is null "+JSONObject.toJSONString(house));
 					h.setStatus(-2);
@@ -261,16 +265,11 @@ public  class ProcessServiceImpl implements ProcessService{
 				break;
 
 			for (int i = 0; i < houseindexList.size(); i++) {
-
-				try {
-					Thread.sleep(1000);
-				}catch (Throwable t){
-					t.printStackTrace();
-				}
-
+				Thread.sleep(2000);
+				logger.info("f sleep 2000");
 				Houseindex houseindex = houseindexList.get(i);
 				String houseHtml = LianjiaWebUtil.fetchHouseHtml(houseindex.getUrl());
-				Thread.sleep(500);
+				logger.info(houseHtml);
 				if("error".equals(houseHtml)){
 					//商品页面找不到，永久重定向
 					logger.info("house is not found, "+JSONObject.toJSONString(houseindex));
@@ -289,18 +288,15 @@ public  class ProcessServiceImpl implements ProcessService{
 					houseindexService.update(houseindex);
 					continue;
 				}
-
 				//判断是否成交
-
 
 				//判断价格变更
 				BigDecimal nowprice = LianjiaWebUtil.getPrice(houseHtml);
-				House nowhouse = LianjiaWebUtil.getAndGenHouseObject(houseindex.getUrl(), houseHtml);
 				if(nowprice==null){
 					logger.info("nowprice is null, "+ JSONObject.toJSONString(houseindex));
 					continue;
 				}
-
+				House nowhouse = LianjiaWebUtil.getAndGenHouseObject(houseindex.getUrl(), houseHtml);
 				Houseprice previousHouseprice = housepriceService.getPrevious(houseindex.getCode());
 				if(previousHouseprice==null){
 					//save newest price

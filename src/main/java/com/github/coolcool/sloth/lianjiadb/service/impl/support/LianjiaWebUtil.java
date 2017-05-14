@@ -1,5 +1,6 @@
 package com.github.coolcool.sloth.lianjiadb.service.impl.support;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.coolcool.sloth.lianjiadb.common.MyHttpClient;
 import com.github.coolcool.sloth.lianjiadb.model.House;
 import org.apache.commons.lang3.StringUtils;
@@ -540,12 +541,12 @@ public abstract class LianjiaWebUtil {
         String url2 = "http://gz.lianjia.com/ershoufang/GZ0002180546.html";
         String url3 = "http://gz.lianjia.com/chengjiao/GZ0002008482.html";
 
-
-        House house = LianjiaWebUtil.fetchAndGenHouseObject(url3);
-
-        if(StringUtils.isEmpty(house.getTitle())|| StringUtils.isBlank(house.getTitle())){
-            System.out.println(111);
-        }
+        MyHttpClient.HttpProxyConfig httpProxyConfig = new MyHttpClient.HttpProxyConfig();
+        httpProxyConfig.setHost("");
+        httpProxyConfig.setPort(0);
+        MyHttpClient.addAvailableHttpProxyConfig(httpProxyConfig);
+        House house = LianjiaWebUtil.fetchAndGenHouseObject(url2);
+        System.out.println(JSONObject.toJSON(house));
 
 
 
