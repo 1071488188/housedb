@@ -20,7 +20,7 @@ public class LianjiaWebUtilTest {
     @Test
     public void testFetchAndGenHouseObject(){
         String houseUrl = "https://gz.lianjia.com/ershoufang/GZ0002180546.html";
-        logger.info(JSONObject.toJSONString(LianjiaWebUtil.fetchAndGenHouseObject(houseUrl)));
+        //logger.info(JSONObject.toJSONString(LianjiaWebUtil.fetchAndGenHouseObject(houseUrl)));
     }
 
     @Test

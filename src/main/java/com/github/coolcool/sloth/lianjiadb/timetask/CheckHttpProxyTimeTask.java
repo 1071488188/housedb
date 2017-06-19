@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.TimerTask;
 
 
+/**
+ * 检测代理服务是否有效, 加入到代理服务器列表
+ */
 @EnableScheduling
 @Service
 public class CheckHttpProxyTimeTask extends TimerTask {

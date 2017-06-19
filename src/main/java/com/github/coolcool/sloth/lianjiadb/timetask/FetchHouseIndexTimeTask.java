@@ -25,6 +25,9 @@ public class FetchHouseIndexTimeTask extends TimerTask {
     static boolean houseDetailFetching = false;
 
 
+    /**
+     * 获取新录入的房源信息
+     */
     @Override
     @Scheduled(cron="0 0/1 * * * ?")   //每5分钟执行一次
     public void run() {
