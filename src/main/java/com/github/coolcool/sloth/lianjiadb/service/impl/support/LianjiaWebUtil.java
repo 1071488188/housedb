@@ -28,15 +28,10 @@ public abstract class LianjiaWebUtil {
     static String firstChenjiaoPageAreasUrl = "https://gz.lianjia.com/chengjiao/${area}/";
     static String chengjiaoPageAreasUrl = "https://gz.lianjia.com/chengjiao/${area}/";
 
-
-
-
-
-
     //解析正则
     static Matcher matcher = null;
-    static Pattern houseUrlInPageWebPattern = Pattern.compile("http://gz.lianjia.com/ershoufang/GZ[0-9]+.html");
-    static Pattern chengjiaoHouseUrlInPageWebPattern = Pattern.compile("http://gz.lianjia.com/chengjiao/GZ[0-9]+" +
+    static Pattern houseUrlInPageWebPattern = Pattern.compile("https://gz.lianjia.com/ershoufang/GZ[0-9]+.html");
+    static Pattern chengjiaoHouseUrlInPageWebPattern = Pattern.compile("https://gz.lianjia.com/chengjiao/GZ[0-9]+" +
             ".html");
     static Pattern totalPageNoInPageWebPattern = Pattern.compile("\"totalPage\":([0-9]+)");
 
@@ -537,14 +532,15 @@ public abstract class LianjiaWebUtil {
 
     public static void main(String[] args) throws IOException {
 
-        String url ="http://gz.lianjia.com/ershoufang/";
-        String url2 = "http://gz.lianjia.com/ershoufang/GZ0002180546.html";
-        String url3 = "http://gz.lianjia.com/chengjiao/GZ0002008482.html";
+        String url ="https://gz.lianjia.com/ershoufang/";
+        String url2 = "https://gz.lianjia.com/ershoufang/GZ0002180546.html";
+        String url3 = "https://gz.lianjia.com/chengjiao/GZ0002008482.html";
+//        代理测试
+//        MyHttpClient.HttpProxyConfig httpProxyConfig = new MyHttpClient.HttpProxyConfig();
+//        httpProxyConfig.setHost("");
+//        httpProxyConfig.setPort(0);
+//        MyHttpClient.addAvailableHttpProxyConfig(httpProxyConfig);
 
-        MyHttpClient.HttpProxyConfig httpProxyConfig = new MyHttpClient.HttpProxyConfig();
-        httpProxyConfig.setHost("");
-        httpProxyConfig.setPort(0);
-        MyHttpClient.addAvailableHttpProxyConfig(httpProxyConfig);
         House house = LianjiaWebUtil.fetchAndGenHouseObject(url2);
         System.out.println(JSONObject.toJSON(house));
 

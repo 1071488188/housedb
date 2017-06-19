@@ -256,9 +256,9 @@ public abstract class MyHttpClient {
 
 
     public static void main(String[] args) {
-        String url ="http://gz.lianjia.com/ershoufang/";
-        String url2 = "http://gz.lianjia.com/ershoufang/GZ0002180546.html";
-        String url3 = "http://gz.lianjia.com/ershoufang/GZ0001565595.html";
+        String url ="https://gz.lianjia.com/ershoufang/";
+        String url2 = "https://gz.lianjia.com/ershoufang/GZ0002180546.html";
+        String url3 = "https://gz.lianjia.com/ershoufang/GZ0001565595.html";
         HttpProxyConfig httpProxyConfig = new HttpProxyConfig("",0,"","");
 //        HttpProxyConfig httpProxyConfig = new HttpProxyConfig("123.59.12.81",10041,"","");
 //        HttpProxyConfig httpProxyConfig = new HttpProxyConfig("123.59.12.81",10041,"","");

@@ -40,7 +40,7 @@ public class CheckHttpProxyTimeTask extends TimerTask {
             addHttpProxyFromDb();
 
             try {
-                String testurl = "http://gz.lianjia.com/ershoufang/GZ0002179878.html";
+                String testurl = "https://gz.lianjia.com/ershoufang/GZ0002179878.html";
                 for (int i = 0; i < MyHttpClient.allHttpProxyConfigs.size(); i++) {
                     MyHttpClient.HttpProxyConfig httpProxyConfig = MyHttpClient.allHttpProxyConfigs.get(i);
                     String result = MyHttpClient.get(testurl,httpProxyConfig);
