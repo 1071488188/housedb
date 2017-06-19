@@ -19,14 +19,14 @@ public abstract class LianjiaWebUtil {
 
     static Logger logger = LoggerFactory.getLogger(LianjiaWebUtil.class);
 
-    static String cityIndexUrl = "http://${city}.lianjia.com/ershoufang/";
-    static String cityAreaIndexUrl = "http://${city}.lianjia.com/ershoufang/${area}/";
+    static String cityIndexUrl = "https://${city}.lianjia.com/ershoufang/";
+    static String cityAreaIndexUrl = "https://${city}.lianjia.com/ershoufang/${area}/";
 
-    static String firstPageAreasUrl = "http://gz.lianjia.com/ershoufang/${area}/";
-    static String pageAreasUrl = "http://gz.lianjia.com/ershoufang/${area}/pg${pageNo}/";
+    static String firstPageAreasUrl = "https://gz.lianjia.com/ershoufang/${area}/";
+    static String pageAreasUrl = "https://gz.lianjia.com/ershoufang/${area}/pg${pageNo}/";
 
-    static String firstChenjiaoPageAreasUrl = "http://gz.lianjia.com/chengjiao/${area}/";
-    static String chengjiaoPageAreasUrl = "http://gz.lianjia.com/chengjiao/${area}/";
+    static String firstChenjiaoPageAreasUrl = "https://gz.lianjia.com/chengjiao/${area}/";
+    static String chengjiaoPageAreasUrl = "https://gz.lianjia.com/chengjiao/${area}/";
 
 
 
