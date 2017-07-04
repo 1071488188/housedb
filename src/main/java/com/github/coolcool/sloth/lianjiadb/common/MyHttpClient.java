@@ -1,6 +1,7 @@
 package com.github.coolcool.sloth.lianjiadb.common;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -26,17 +27,21 @@ public abstract class MyHttpClient {
     public static List<HttpProxyConfig> availableHttpProxyConfigs = new ArrayList<>();//目前可用
 
     static {
-        allHttpProxyConfigs.add(new HttpProxyConfig("",0,"",""));
-        availableHttpProxyConfigs.add(new HttpProxyConfig("",0,"",""));
+        /*allHttpProxyConfigs.add(new HttpProxyConfig("",0,"",""));
+        availableHttpProxyConfigs.add(new HttpProxyConfig("",0,"",""));*/
+//        allHttpProxyConfigs.add(new HttpProxyConfig("proxy.abuyun.com",9020,"H9BRL1I254J80C1D","8D1727F9A09E4350"));
+//        availableHttpProxyConfigs.add(new HttpProxyConfig("proxy.abuyun.com",9020,"H9BRL1I254J80C1D","8D1727F9A09E4350"));
+//        allHttpProxyConfigs.add(new HttpProxyConfig("proxy.abuyun.com",9020,"H54H5JW1A7V2224D","7949F60FA95D1FB9"));
+//        availableHttpProxyConfigs.add(new HttpProxyConfig("proxy.abuyun.com",9020,"H54H5JW1A7V2224D","7949F60FA95D1FB9"));
     }
     
     public static void addAvailableHttpProxyConfig(HttpProxyConfig httpProxyConfig){
         available = true;
-        for (int i = 0; i < availableHttpProxyConfigs.size(); i++) {
-            HttpProxyConfig temp = availableHttpProxyConfigs.get(i);
-            if(temp.getHost().equals(httpProxyConfig.getHost()))
-                return ;
-        }
+//        for (int i = 0; i < availableHttpProxyConfigs.size(); i++) {
+//            HttpProxyConfig temp = availableHttpProxyConfigs.get(i);
+//            if(temp.getHost().equals(httpProxyConfig.getHost()))
+//                return ;
+//        }
         logger.info("set myhttpclient available....");
         availableHttpProxyConfigs.add(httpProxyConfig);
         logger.info("add available HttpProxyConfigs :"+JSONObject.toJSONString(httpProxyConfig));
@@ -56,11 +61,11 @@ public abstract class MyHttpClient {
         }
     }
 
-    public static String get(String url){
+    public static String get(String url) throws IOException  {
         return getByRandomProxy(url);
     }
 
-    public static String getByRandomProxy(String url){
+    public static String getByRandomProxy(String url) throws IOException  {
 
         HttpProxyConfig httpProxyConfig = null;
 
@@ -82,18 +87,18 @@ public abstract class MyHttpClient {
             try {
                 Thread.sleep(60*1000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error("",e);
             }
             return "";
         }
-        //logger.info("find http proxy :" + JSONObject.toJSONString(httpProxyConfig));
+        logger.info("find http proxy :" + JSONObject.toJSONString(httpProxyConfig));
         return get(url, httpProxyConfig);
 
 
     }
 
 
-    public static String get(String url, HttpProxyConfig httpProxyConfig){
+    public static String get(String url, HttpProxyConfig httpProxyConfig) throws IOException  {
         StringBuilder sb = new StringBuilder();
         Proxy proxy = null;
         // /创建代理服务器
@@ -114,6 +119,8 @@ public abstract class MyHttpClient {
             }else {
                 connection = (HttpURLConnection) tempUrl.openConnection(proxy);
             }
+            connection.setConnectTimeout(6000);
+            connection.setReadTimeout(6000);
             is = connection.getInputStream();
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader reader = new BufferedReader(isr);
@@ -121,15 +128,20 @@ public abstract class MyHttpClient {
             while ((inputLine = reader.readLine())!=null) {
                 sb.append(inputLine).append("\n");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "error";
+        }catch (FileNotFoundException fe) {
+            logger.error("",fe);
+            //return "http_uri_file_not_fount";
+            throw fe;
+        }catch (Exception e) {
+            logger.error("",e);
+            //return "http_connection_error";
+            throw e;
         }finally {
             if(is != null){
                 try {
                     is.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("",e);
                     return "error";
                 }
             }
@@ -160,6 +172,7 @@ public abstract class MyHttpClient {
         String host;
         int port;
         String username;
+        @JSONField(serialize=false)
         String password;
         int status=0; //0:暂停使用；1:使用中
         int type = 0;//0:http proxy; 1:socket proxy
@@ -249,32 +262,6 @@ public abstract class MyHttpClient {
         // 完毕，关闭所有链接
         os.close();
         is.close();
-    }
-
-
-
-
-
-    public static void main(String[] args) {
-        String url ="https://gz.lianjia.com/ershoufang/";
-        String url2 = "https://gz.lianjia.com/ershoufang/GZ0002180546.html";
-        String url3 = "https://gz.lianjia.com/ershoufang/GZ0001565595.html";
-        HttpProxyConfig httpProxyConfig = new HttpProxyConfig("",0,"","");
-//        HttpProxyConfig httpProxyConfig = new HttpProxyConfig("123.59.12.81",10041,"","");
-//        HttpProxyConfig httpProxyConfig = new HttpProxyConfig("123.59.12.81",10041,"","");
-//        HttpProxyConfig httpProxyConfig = new HttpProxyConfig("123.59.12.81",10041,"","");
-//        HttpProxyConfig httpProxyConfig = new HttpProxyConfig("123.59.12.81",10041,"","");
-//        HttpProxyConfig httpProxyConfig = new HttpProxyConfig("123.59.12.81",10041,"","");
-//        HttpProxyConfig httpProxyConfig = new HttpProxyConfig("123.59.12.81",10041,"","");
-        String result = get(url2,httpProxyConfig);
-        if( (result.indexOf("验证异常流量")>-1) || (result.indexOf("ERROR.TIP_TITLE")>-1) ){
-            logger.info("er");
-        }else if ("error".equals(result)){
-            logger.info("er");
-        }else {
-            logger.info("OK");
-            logger.info(result);
-        }
     }
 
 }

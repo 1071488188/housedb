@@ -19,7 +19,7 @@ public interface ProcessService{
 	 */
 	void fetchHouseUrls() throws InterruptedException;
 
-	void fetchHouseDetail() throws InterruptedException;
+	//void fetchHouseDetail() throws InterruptedException;
 
 	void checkChange() throws InterruptedException;
 

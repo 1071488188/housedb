@@ -35,7 +35,7 @@ public class CheckHttpProxyTimeTask extends TimerTask {
     HttpProxyMapper httpProxyMapper;
 
     @Override
-    @Scheduled(cron="0 0/5 * * * ?")   //每1分钟执行一次
+    @Scheduled(cron="0 0/1 * * * ?")   //每1分钟执行一次
     public void run() {
         if(!running){
             running = true;
@@ -48,7 +48,7 @@ public class CheckHttpProxyTimeTask extends TimerTask {
                     MyHttpClient.HttpProxyConfig httpProxyConfig = MyHttpClient.allHttpProxyConfigs.get(i);
                     String result = MyHttpClient.get(testurl,httpProxyConfig);
                     if("error".equals(result) || (result.indexOf("流量异常")>-1) || (result.indexOf("ERROR")
-                            >-1) ){
+                            >-1) || result.indexOf("under a different URI")>-1){
                         httpProxyConfig.setStatus(0);
                         log.info("proxyerror:"+ JSONObject.toJSONString(httpProxyConfig));
                         MyHttpClient.removeAvailableHttpProxyConfig(httpProxyConfig);

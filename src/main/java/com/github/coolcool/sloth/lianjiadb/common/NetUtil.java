@@ -269,24 +269,24 @@ public abstract class NetUtil {
             }
         } catch (HttpException e) {
             logger.error(requestUri + " 远程服务调用时发生HttpException，异常信息: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("",e);
         } catch (IOException e) {
             logger.error(requestUri + " 远程服务调用时发生IOException，异常信息: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("",e);
         } finally {
             postMethod.releaseConnection();
             if (bufferedreader != null) {
                 try {
                     bufferedreader.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("",e);
                 }
             }
             if (in != null) {
                 try {
                     in.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("",e);
                 }
             }
         }

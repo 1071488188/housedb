@@ -21,9 +21,13 @@ public interface HouseService{
 
 	House getByCode(String code);
 
+	Boolean isExist(String code);
+
 	void deleteById(Object id);
 
 	void update(House house);
+
+	void updateChengjiaoPriceByCode(String code, Double chengjiaoPrice);
 
 	List<House> list();
 

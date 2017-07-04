@@ -3,11 +3,14 @@ package com.github.coolcool.sloth.lianjiadb.service.impl.support;
 import com.alibaba.fastjson.JSONObject;
 import com.github.coolcool.sloth.lianjiadb.common.MyHttpClient;
 import com.github.coolcool.sloth.lianjiadb.model.House;
+import io.swagger.models.auth.In;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,6 +33,10 @@ public abstract class LianjiaWebUtil {
 
     //解析正则
     static Matcher matcher = null;
+
+    //列表页面
+    static Pattern gzListPageTotalCountPattern = Pattern.compile("<h2 class=\"total fl\">共找到<span>(\\d+?)</span>套广州二手房</h2>");
+
     static Pattern houseUrlInPageWebPattern = Pattern.compile("https://gz.lianjia.com/ershoufang/GZ[0-9]+.html");
     static Pattern chengjiaoHouseUrlInPageWebPattern = Pattern.compile("https://gz.lianjia.com/chengjiao/GZ[0-9]+" +
             ".html");
@@ -41,6 +48,15 @@ public abstract class LianjiaWebUtil {
 
     static Pattern favCountPattern = Pattern.compile("id=\"favCount\" class=\"count\">([0-9]+)<");
     static Pattern cartCountPattern = Pattern.compile("id=\"cartCount\" class=\"count\">([0-9]+)<");
+
+
+    //已成交=======================================
+    static Pattern chengjiaoTitlePattern = Pattern.compile("<div class=\"house-title\"><div class=\"wrapper\">(.*?)<span>");
+    static Pattern chengjiaoPricePattern = Pattern.compile("<span class=\"dealTotalPrice\"><i>(\\d+(\\.\\d+)?)" +
+            "</i>万</span><b>(\\d+(\\.\\d+)?)</b>");
+    static Pattern chengjiaoFavCountPattern = Pattern.compile("<span><label>([0-9]+)</label>关注（人）</span>");
+    static Pattern chengjiaoCartCountPattern = Pattern.compile("<span><label>([0-9]+)</label>浏览（次）</span>");
+    static Pattern chengjiaoDatePattern = Pattern.compile("<span>(.*?) 链家成交</span>");
 
     static Pattern pricePattern = Pattern.compile("span class=\"total\">(\\d+(\\.\\d+)?)</span>");
     static Pattern unitPricePattern = Pattern.compile("class=\"unitPriceValue\">(\\d+(\\.\\d+)?)<");
@@ -74,11 +90,6 @@ public abstract class LianjiaWebUtil {
     static Pattern trafficDescPattern = Pattern.compile("<div class=\"name\">交通出行</div><div class=\"content\">((.|\n|\r)*?)</div>");
 
 
-    //已成交=======================================
-
-    static Pattern chengjiaoTitlePattern = Pattern.compile("<div class=\"house-title\"><div class=\"wrapper\">(.*?)<span>");
-    static Pattern chengjiaoPrice = Pattern.compile("<span class=\"dealTotalPrice\"><i>(\\d+(\\.\\d+)?)" +
-            "</i>万</span><b>(\\d+(\\.\\d+)?)</b>");
 
     static Pattern t1 = Pattern.compile("class=\"sp01\"><label>(.*?)</label>(.*?)</span>"); //<span class="sp01"><label>1室1厅</label>高楼层(共27层)</span>
     static Pattern t2 = Pattern.compile("class=\"sp02\"><label>(.*?)</label>"); //<span
@@ -90,6 +101,16 @@ public abstract class LianjiaWebUtil {
     static Pattern t4 = Pattern.compile("-<a .*?>(.*?)</a><a .*?>(.*?)</a>");
     //-<a href="/chengjiao/tianhe/">天河</a><a href="/chengjiao/chebei/">车陂</a>
 
+
+    public static Integer getGzListPageTotalCount(String houseHtml){
+        String reg = ">\\s+([^\\s<]*)\\s+<";
+        houseHtml = houseHtml.replaceAll(reg, ">$1<");
+        matcher = gzListPageTotalCountPattern.matcher(houseHtml);
+        if (matcher.find()) {
+            return Integer.valueOf(matcher.group(1));
+        }
+        return null;
+    }
 
     public static House getAndGenChengjiaoHouseObject(String houseUrl,String houseHtml) {
 
@@ -104,9 +125,9 @@ public abstract class LianjiaWebUtil {
             house.setTitle(matcher.group(1));
         }
 
-        matcher = chengjiaoPrice.matcher(houseHtml);
+        matcher = chengjiaoPricePattern.matcher(houseHtml);
         if (matcher.find()) {
-            house.setChengjiaoPrice(new BigDecimal((matcher.group(1))));
+            house.setChengjiaoPrice(Double.valueOf(matcher.group(1)));
         }
 
         matcher = t1.matcher(houseHtml);
@@ -149,7 +170,7 @@ public abstract class LianjiaWebUtil {
         return cityAreaIndexUrl.replace("${city}",city).replace("${area}",area);
     }
 
-    public static int fetchAreaTotalPageNo(String area){
+    public static int fetchAreaTotalPageNo(String area) throws IOException {
         String pageUrl = firstPageAreasUrl.replace("${area}", area);
         String result = MyHttpClient.get(pageUrl);
         if(StringUtils.isBlank(result)){
@@ -162,7 +183,7 @@ public abstract class LianjiaWebUtil {
         return 0;
     }
 
-    public static int fetchAreaChenjiaoTotalPageNo(String area){
+    public static int fetchAreaChenjiaoTotalPageNo(String area) throws IOException {
         String pageUrl = firstChenjiaoPageAreasUrl.replace("${area}", area);
         String result = MyHttpClient.get(pageUrl);
         Matcher matcher = totalPageNoInPageWebPattern.matcher(result);
@@ -173,7 +194,7 @@ public abstract class LianjiaWebUtil {
     }
 
 
-    public static Set<String> fetchAreaHouseUrls(String area, int pageNo) {
+    public static Set<String> fetchAreaHouseUrls(String area, int pageNo) throws IOException {
 
         Set<String> urls = new HashSet<>();
 
@@ -198,7 +219,7 @@ public abstract class LianjiaWebUtil {
         return urls;
     }
 
-    public static Set<String> fetchAreaChenjiaoHouseUrls(String area, int pageNo) {
+    public static Set<String> fetchAreaChenjiaoHouseUrls(String area, int pageNo) throws IOException {
 
         Set<String> urls = new HashSet<>();
 
@@ -224,21 +245,21 @@ public abstract class LianjiaWebUtil {
     }
 
 
-    public static BigDecimal getPrice(String houseHtml){
-        BigDecimal bigDecimal = null;
+    public static Double getPrice(String houseHtml){
+        Double price = null;
         String result = houseHtml;
         //result = result.replace("\r","").replace("\n","").replaceAll(">(.*?)<","");
         String reg = ">\\s+([^\\s<]*)\\s+<";
         result = result.replaceAll(reg, ">$1<");
         matcher = pricePattern.matcher(result);
         if(matcher.find()) {
-            bigDecimal = new BigDecimal(matcher.group(1));
+            price = Double.valueOf(matcher.group(1));
         }
-        return bigDecimal;
+        return price;
     }
 
-    public static BigDecimal fetchPrice(String houseUrl){
-        BigDecimal bigDecimal = null;
+    public static Double fetchPrice(String houseUrl) throws IOException {
+        BigDecimal price = null;
         String fangUrl = houseUrl;
         String result = MyHttpClient.get(fangUrl);
         String reg = ">\\s+([^\\s<]*)\\s+<";
@@ -246,14 +267,14 @@ public abstract class LianjiaWebUtil {
         return getPrice(result);
     }
 
-    public static String fetchHouseHtml(String houseUrl){
+    public static String fetchHouseHtml(String houseUrl) throws IOException {
         String result = MyHttpClient.get(houseUrl);
         String reg = ">\\s+([^\\s<]*)\\s+<";
         result = result.replaceAll(reg, ">$1<");
         return result;
     }
 
-    public static boolean fetchRemoved(String houseUrl){
+    public static boolean fetchRemoved(String houseUrl) throws IOException {
         String fangUrl = houseUrl;
         return getRemoved(MyHttpClient.get(fangUrl));
     }
@@ -270,8 +291,73 @@ public abstract class LianjiaWebUtil {
         return false;
     }
 
+    public static Double getChengjiaoPrice(String houseHtml){
+        String result = houseHtml;
 
-    public static House fetchAndGenHouseObject(String houseUrl) {
+        String reg = ">\\s+([^\\s<]*)\\s+<";
+        result = result.replaceAll(reg, ">$1<");
+        matcher = chengjiaoPricePattern.matcher(result);
+        if(matcher.find()) {
+            return Double.valueOf(matcher.group(1));
+        }
+        return 0.0;
+    }
+
+    public static boolean getChengJiaoed(String houseHtml){
+        String result = houseHtml;
+
+        String reg = ">\\s+([^\\s<]*)\\s+<";
+        result = result.replaceAll(reg, ">$1<");
+        matcher = chengjiaoPricePattern.matcher(result);
+        if(matcher.find()) {
+            return true;
+        }
+        return false;
+    }
+
+    public static Integer getChengjiaoFavCount(String chengjiaoHouseHtml){
+        String result = chengjiaoHouseHtml;
+        String reg = ">\\s+([^\\s<]*)\\s+<";
+        result = result.replaceAll(reg, ">$1<");
+        matcher = chengjiaoFavCountPattern.matcher(result);
+        if(matcher.find()) {
+            return Integer.valueOf(matcher.group(1));
+        }
+        return null;
+    }
+
+    public static Integer getChengjiaoCartCount(String chengjiaoHouseHtml){
+        String result = chengjiaoHouseHtml;
+        String reg = ">\\s+([^\\s<]*)\\s+<";
+        result = result.replaceAll(reg, ">$1<");
+        matcher = chengjiaoCartCountPattern.matcher(result);
+        if(matcher.find()) {
+            return Integer.valueOf(matcher.group(1));
+        }
+        return null;
+    }
+
+    public static Date getChengjiaoDate(String chengjiaoHouseHtml){
+        String result = chengjiaoHouseHtml;
+        String reg = ">\\s+([^\\s<]*)\\s+<";
+        Date date = null;
+        result = result.replaceAll(reg, ">$1<");
+        matcher = chengjiaoDatePattern.matcher(result);
+        if(matcher.find()) {
+            try{
+                String dateStr = matcher.group(1);
+                date = DateUtils.parseDate(dateStr,"yyyy.MM.dd");
+            }catch (ParseException e){
+                logger.error("",e);
+            }
+        }
+        return date;
+    }
+
+
+
+
+    public static House fetchAndGenHouseObject(String houseUrl) throws IOException {
         House house = new House(houseUrl);
         String fangUrl = houseUrl;
         String result = MyHttpClient.get(fangUrl);
@@ -314,22 +400,22 @@ public abstract class LianjiaWebUtil {
 
         matcher = pricePattern.matcher(houseHtml);
         if(matcher.find()) {
-            house.setPrice(new BigDecimal(matcher.group(1)));
+            house.setPrice(Double.valueOf(matcher.group(1)));
         }
 
         matcher = unitPricePattern.matcher(houseHtml);
         if(matcher.find()) {
-            house.setUnitprice(new BigDecimal(matcher.group(1)));
+            house.setUnitprice(Double.valueOf(matcher.group(1)));
         }
 
         matcher = firstPayPricePattern.matcher(houseHtml);
         if(matcher.find()) {
-            house.setFirstPayPrice(new BigDecimal(matcher.group(1)));
+            house.setFirstPayPrice(Double.valueOf(matcher.group(1)));
         }
 
         matcher = taxPricePattern.matcher(houseHtml);
         if(matcher.find()) {
-            house.setTaxPrice(new BigDecimal(matcher.group(1)));
+            house.setTaxPrice(Double.valueOf(matcher.group(1)));
         }
 
         matcher = roomMainAndSubInfoPattern.matcher(houseHtml);
@@ -473,7 +559,7 @@ public abstract class LianjiaWebUtil {
      *生成各个城市的区域sql
      * 上海需要特殊处理
      */
-    static public void fetchArea(){
+    static public void fetchArea() throws IOException {
         String city = "bj";
         String name = "北京";
         String cityId = "1";

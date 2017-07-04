@@ -13,6 +13,8 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 接口或类的说明
@@ -21,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 public class UrlUtil {
 
     public static final String ENCODING_UTF8 = "UTF-8";
-    private static final Log LOG = LogFactory.getLog(UrlUtil.class);
+    static Logger logger = LoggerFactory.getLogger(MailUtil.class);
 
     /**
      * 处理URL参数串，把参数名和参数值转化成键值对的形式
@@ -78,7 +80,7 @@ public class UrlUtil {
             else if (kv.length == 1 && kv[0] != null)
                 paramMap.put(kv[0], "");
             else
-                LOG.warn(_str);
+                logger.warn(_str);
         }
         return paramMap;
     }
@@ -106,6 +108,7 @@ public class UrlUtil {
                         sb.append(entry.getKey()).append("=").append(URLEncoder.encode(value, ENCODING_UTF8));
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
+                        logger.error("",e);
                     }
                 } else
                     sb.append(entry.getKey()).append("=").append(value);
@@ -210,6 +213,7 @@ public class UrlUtil {
             result = URLDecoder.decode(sortParamsString.toString(), ENCODING_UTF8);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
+            logger.error("",e);
         }
 
         return result;
@@ -249,6 +253,7 @@ public class UrlUtil {
             return URLEncoder.encode(arg, ENCODING_UTF8);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
+            logger.error("",e);
             return arg;
         }
     }
@@ -266,6 +271,7 @@ public class UrlUtil {
             return URLDecoder.decode(arg, ENCODING_UTF8);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
+            logger.error("",e);
             return arg;
         }
     }

@@ -1,6 +1,5 @@
 package com.github.coolcool.sloth.lianjiadb.timetask;
 
-import com.github.coolcool.sloth.lianjiadb.common.Page;
 import com.github.coolcool.sloth.lianjiadb.common.log.HouseLog;
 import com.github.coolcool.sloth.lianjiadb.common.log.LogstashUtil;
 import com.github.coolcool.sloth.lianjiadb.model.House;

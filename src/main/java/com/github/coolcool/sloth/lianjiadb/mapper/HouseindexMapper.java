@@ -34,8 +34,9 @@ public interface HouseindexMapper{
 	Integer updateByPrimaryKey(Houseindex houseindex);
 
 	@Insert({
-		"INSERT INTO houseindex (code, url, createtime)",
-		"VALUE (#{code}, #{url}, now()) ON DUPLICATE KEY UPDATE code=code"
+		"INSERT INTO houseindex (code, url, status, createtime)",
+		"VALUE (#{code}, #{url}, #{status}, now()) ON DUPLICATE KEY UPDATE code=code, url=#{url}, status=#{status}, " +
+				"updatetime=now()"
 	})
 	Integer insert(Houseindex houseindex);
 

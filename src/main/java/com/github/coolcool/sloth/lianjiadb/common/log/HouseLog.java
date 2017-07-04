@@ -189,15 +189,4 @@ public class HouseLog {
         return temp;
     }
 
-    public static void main(String[] args) {
-        String houseUrl = "https://gz.lianjia.com/chengjiao/GZ0002008482.html";
-        String html = MyHttpClient.get(houseUrl, null);
-        House house = LianjiaWebUtil.getAndGenHouseObject(houseUrl, html);
-        System.out.println(JSONObject.toJSON(house));
-
-        HouseLog houseLog = new HouseLog(house);
-        System.out.println(houseLog.toLogString());
-    }
-
-
 }

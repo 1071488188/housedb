@@ -2,6 +2,8 @@ package com.github.coolcool.sloth.lianjiadb.service.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.text.DecimalFormat;
 import java.util.*;
 import com.github.coolcool.sloth.lianjiadb.mapper.HousepriceMapper;
 import com.github.coolcool.sloth.lianjiadb.model.Houseprice;
@@ -23,6 +25,8 @@ import javax.annotation.Generated;
 public  class HousepriceServiceImpl implements HousepriceService{
 
 	Logger logger = LoggerFactory.getLogger(HousepriceService.class);
+
+	final static DecimalFormat df = new DecimalFormat("#.00");
 
 	@Autowired
 	private HousepriceMapper housepriceMapper;
@@ -76,6 +80,11 @@ public  class HousepriceServiceImpl implements HousepriceService{
 		if(houseprices==null || houseprices.size()==0)
 			return null;
 		return houseprices.get(0);
+	}
+
+	@Override
+	public String format(Double price) {
+		return df.format(price);
 	}
 
 }

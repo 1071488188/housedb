@@ -1,6 +1,7 @@
 package com.github.coolcool.sloth.lianjiadb.model;
 
 import javax.annotation.Generated;
+import java.text.DecimalFormat;
 
 @Generated(
 	value = {
@@ -11,12 +12,14 @@ import javax.annotation.Generated;
 )
 public class Houseprice {
 
+	final static DecimalFormat df = new DecimalFormat("#.00");
+
 	public Houseprice() {
 	}
 
 	public Houseprice(String code, Double price) {
-		this.price = price;
 		this.code = code;
+		this.price = Double.valueOf(df.format(price));
 	}
 
 	/**

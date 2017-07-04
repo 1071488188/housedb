@@ -42,12 +42,26 @@ public  class HouseServiceImpl implements HouseService{
 	}
 
 	@Override
+	public Boolean isExist(String code) {
+		int count = houseMapper.countByCode(code);
+		if(count == 0)
+			return Boolean.FALSE;
+		else
+			return Boolean.TRUE;
+	}
+
+	@Override
 	public void deleteById(Object id){
 		houseMapper.deleteByPrimaryKey(id);
 	}
 	@Override
 	public void update(House house){
 		houseMapper.updateByPrimaryKey(house);
+	}
+
+	@Override
+	public void updateChengjiaoPriceByCode(String code, Double chengjiaoPrice) {
+		houseMapper.updateChengjiaoPriceByCode(code,chengjiaoPrice);
 	}
 
 	@Override

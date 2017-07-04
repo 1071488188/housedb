@@ -23,12 +23,15 @@ public interface HouseMapper{
 	@Select("SELECT * FROM house WHERE code=#{code} LIMIT 1 ")
 	House getByCode(@Param("code") String code);
 
+	@Select("SELECT count(code) FROM house WHERE code=#{code} LIMIT 1 ")
+	int countByCode(@Param("code") String code);
+
 
 	@Delete("DELETE FROM house WHERE id = #{primaryKey} ")
 	Integer deleteByPrimaryKey(@Param("primaryKey") Object primaryKey);
 
 	@Update({
-		"UPDATE house SET id=#{id}, code=#{code}, url=#{url}, title=#{title}, subtitle=#{subtitle}, favcount=#{favcount}, cartcount=#{cartcount}, price=#{price}, unitprice=#{unitprice}, firstPayPrice=#{firstPayPrice}, taxPrice=#{taxPrice}, roomMainInfo=#{roomMainInfo}, roomSubInfo=#{roomSubInfo}, roomMainType=#{roomMainType}, roomSubType=#{roomSubType}, areaMainInfo=#{areaMainInfo}, areaSubInfo=#{areaSubInfo}, communityName=#{communityName}, areaName=#{areaName}, schoolName=#{schoolName}, tags=#{tags}, decoratingDesc=#{decoratingDesc}, houseTypeDesc=#{houseTypeDesc}, investmentDesc=#{investmentDesc}, villageDesc=#{villageDesc}, schoolDesc=#{schoolDesc}, sellingPointDesc=#{sellingPointDesc}, reason4saleDesc=#{reason4saleDesc}, supportingDesc=#{supportingDesc}, trafficDesc=#{trafficDesc}, createtime=#{createtime}, baseContent1=#{baseContent1}, baseContent2=#{baseContent2}, baseContent3=#{baseContent3}, baseContent4=#{baseContent4}, baseContent5=#{baseContent5}, baseContent6=#{baseContent6}, baseContent7=#{baseContent7}, baseContent8=#{baseContent8}, baseContent9=#{baseContent9}, baseContent10=#{baseContent10}, baseContent11=#{baseContent11}, baseContent12=#{baseContent12}, transactionContent1=#{transactionContent1}, transactionContent2=#{transactionContent2}, transactionContent3=#{transactionContent3}, transactionContent4=#{transactionContent4}, transactionContent5=#{transactionContent5}, transactionContent6=#{transactionContent6}, transactionContent7=#{transactionContent7}, transactionContent8=#{transactionContent8}, transactionContent9=#{transactionContent9}, transactionContent10=#{transactionContent10}, chengjiaoPrice=#{chengjiaoPrice} where id = #{id}"
+		"UPDATE house SET id=#{id}, code=#{code}, url=#{url}, title=#{title}, subtitle=#{subtitle}, favcount=#{favcount}, cartcount=#{cartcount}, price=#{price}, unitprice=#{unitprice}, firstPayPrice=#{firstPayPrice}, taxPrice=#{taxPrice}, roomMainInfo=#{roomMainInfo}, roomSubInfo=#{roomSubInfo}, roomMainType=#{roomMainType}, roomSubType=#{roomSubType}, areaMainInfo=#{areaMainInfo}, areaSubInfo=#{areaSubInfo}, communityName=#{communityName}, areaName=#{areaName}, schoolName=#{schoolName}, tags=#{tags}, decoratingDesc=#{decoratingDesc}, houseTypeDesc=#{houseTypeDesc}, investmentDesc=#{investmentDesc}, villageDesc=#{villageDesc}, schoolDesc=#{schoolDesc}, sellingPointDesc=#{sellingPointDesc}, reason4saleDesc=#{reason4saleDesc}, supportingDesc=#{supportingDesc}, trafficDesc=#{trafficDesc}, createtime=#{createtime}, baseContent1=#{baseContent1}, baseContent2=#{baseContent2}, baseContent3=#{baseContent3}, baseContent4=#{baseContent4}, baseContent5=#{baseContent5}, baseContent6=#{baseContent6}, baseContent7=#{baseContent7}, baseContent8=#{baseContent8}, baseContent9=#{baseContent9}, baseContent10=#{baseContent10}, baseContent11=#{baseContent11}, baseContent12=#{baseContent12}, transactionContent1=#{transactionContent1}, transactionContent2=#{transactionContent2}, transactionContent3=#{transactionContent3}, transactionContent4=#{transactionContent4}, transactionContent5=#{transactionContent5}, transactionContent6=#{transactionContent6}, transactionContent7=#{transactionContent7}, transactionContent8=#{transactionContent8}, transactionContent9=#{transactionContent9}, transactionContent10=#{transactionContent10}, chengjiaoPrice=#{chengjiaoPrice}, chengjiaoDate=#{chengjiaoDate} where id = #{id}"
 	})
 	Integer updateByPrimaryKey(House house);
 
@@ -53,5 +56,12 @@ public interface HouseMapper{
 
 	@Select("SELECT `AUTO_INCREMENT` as number FROM  INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'test' AND TABLE_NAME = 'house'")
 	Integer increment();
+
+
+	@Update({
+			"UPDATE house SET chengjiaoPrice=#{chengjiaoPrice} where code = #{code}"
+	})
+	void updateChengjiaoPriceByCode(String code, Double chengjiaoPrice);
+
 	
 }

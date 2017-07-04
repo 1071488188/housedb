@@ -20,4 +20,5 @@ logs/
 logstash/
 
 src/main/java/com/github/coolcool/sloth/lianjiadb/Test.java
-#/src/main/java/com/github/coolcool/sloth/lianjiadb/common/MailUtil.java
+/src/main/java/com/github/coolcool/sloth/lianjiadb/common/MailUtil.java
+deploy.sh

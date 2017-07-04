@@ -36,41 +36,6 @@ public class HouseController {
 
 	@RequestMapping(value = "/test", method = RequestMethod.GET)
 	public String test() {
-
-		String city = "gz";
-		String cityId = "3";
-		List<Area> areas = areaMapper.listOneLevelChilden(3);
-
-		for (int i = 0; i < areas.size(); i++) {
-			Area area = areas.get(i);
-			String areaCode = area.getCode();
-			String areaId = area.getId()+"";
-
-			String basesql = "insert into area ( `name`,`code`,`parentsId`) values ('${name}','${code}',${cityId});";
-			String cityAreaIndexUr = LianjiaWebUtil.getCityAreaIndexUrl(city,areaCode);
-			String result = MyHttpClient.get(cityAreaIndexUr);
-			String reg = ">\\s+([^\\s<]*)\\s+<";
-			result = result.replaceAll(reg, ">$1<");
-			//System.out.println(result);
-			Pattern tempPattern = Pattern.compile("<div data-role=\"ershoufang\" ><div>(.*?)</div></div><!-- 地铁 -->");
-			Matcher matcher = tempPattern.matcher(result);
-			String tempResult = "";
-			if (matcher.find()) {
-				tempResult = matcher.group(1);
-			}
-			//System.out.println(tempResult);
-			tempPattern = Pattern.compile("<a href=\"/ershoufang/(.*?)/\" >(.*?)</a>");
-			matcher = tempPattern.matcher(tempResult);
-			while (matcher.find()) {
-				System.out.println(basesql.replace("${code}",matcher.group(1)).replace("${name}",matcher.group(2)).replace("${cityId}",areaId) );
-			}
-
-
-		}
-
-
-
-
 		return "success";
 	}
 

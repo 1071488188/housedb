@@ -31,5 +31,12 @@ public interface HousepriceService{
 
 	Houseprice getPrevious(String code);
 
+	/**
+	 * 精确到小数点后两位
+	 * @param price
+	 * @return
+     */
+	String format(Double price);
+
 
 }

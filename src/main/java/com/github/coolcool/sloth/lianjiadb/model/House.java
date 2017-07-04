@@ -1,10 +1,9 @@
 package com.github.coolcool.sloth.lianjiadb.model;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.annotation.Generated;
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Generated(
 	value = {
@@ -50,19 +49,19 @@ public class House {
 	/**
 	   
 	 */
-	private java.math.BigDecimal price;
+	private Double price;
 	/**
 	   
 	 */
-	private java.math.BigDecimal unitprice;
+	private Double unitprice;
 	/**
 	   
 	 */
-	private java.math.BigDecimal firstPayPrice;
+	private Double firstPayPrice;
 	/**
 	   
 	 */
-	private java.math.BigDecimal taxPrice;
+	private Double taxPrice;
 	/**
 	   
 	 */
@@ -236,8 +235,14 @@ public class House {
 	private  String html;
 
 	private  double roomSize;
+	/**
+	 * 0:未处理；1:在售；2:已成交；-1:已经下架；-2：信息异常；-301：找不到
+	 */
+	private Integer status;
 
-	private java.math.BigDecimal chengjiaoPrice;
+	private Double chengjiaoPrice;
+
+	private Date chengjiaoDate;
 
 
 	public Long getId() {
@@ -289,34 +294,38 @@ public class House {
 	public void setCartcount(Integer cartcount) {
 		this.cartcount = cartcount;
 	} 
-	public java.math.BigDecimal getPrice() {
+	public Double getPrice() {
 		return price;
 	}
 
-	public void setPrice(java.math.BigDecimal price) {
+	public void setPrice(Double price) {
 		this.price = price;
-	} 
-	public java.math.BigDecimal getUnitprice() {
+	}
+
+	public Double getUnitprice() {
 		return unitprice;
 	}
 
-	public void setUnitprice(java.math.BigDecimal unitprice) {
+	public void setUnitprice(Double unitprice) {
 		this.unitprice = unitprice;
-	} 
-	public java.math.BigDecimal getFirstPayPrice() {
+	}
+
+	public Double getFirstPayPrice() {
 		return firstPayPrice;
 	}
 
-	public void setFirstPayPrice(java.math.BigDecimal firstPayPrice) {
+	public void setFirstPayPrice(Double firstPayPrice) {
 		this.firstPayPrice = firstPayPrice;
-	} 
-	public java.math.BigDecimal getTaxPrice() {
+	}
+
+	public Double getTaxPrice() {
 		return taxPrice;
 	}
 
-	public void setTaxPrice(java.math.BigDecimal taxPrice) {
+	public void setTaxPrice(Double taxPrice) {
 		this.taxPrice = taxPrice;
-	} 
+	}
+
 	public String getRoomMainInfo() {
 		return roomMainInfo;
 	}
@@ -628,11 +637,27 @@ public class House {
 		this.roomSize = roomSize;
 	}
 
-	public BigDecimal getChengjiaoPrice() {
+	public Double getChengjiaoPrice() {
 		return chengjiaoPrice;
 	}
 
-	public void setChengjiaoPrice(BigDecimal chengjiaoPrice) {
+	public void setChengjiaoPrice(Double chengjiaoPrice) {
 		this.chengjiaoPrice = chengjiaoPrice;
+	}
+
+	public Date getChengjiaoDate() {
+		return chengjiaoDate;
+	}
+
+	public void setChengjiaoDate(Date chengjiaoDate) {
+		this.chengjiaoDate = chengjiaoDate;
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
 	}
 }

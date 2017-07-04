@@ -36,13 +36,13 @@ public class CheckChangingTimeTask extends TimerTask {
      * 检查价格变化、下架
      */
     @Override
-    @Scheduled(cron="0 0/2 * * * ?")
+    @Scheduled(cron="0 0/1 * * * ?")
     public void run() {
 
-        int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-
-        if( hour != checkchangingHour && !dev) // 每天特定时间执行一次
-            return;
+//        int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+//
+//        if( hour != checkchangingHour && !dev) // 每天特定时间执行一次
+//            return;
 
         if(MyHttpClient.available && !running){
             running = true;
