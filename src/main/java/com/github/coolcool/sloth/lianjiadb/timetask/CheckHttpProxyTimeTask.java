@@ -90,4 +90,12 @@ public class CheckHttpProxyTimeTask extends TimerTask {
         }
     }
 
+    /**
+     * 获取代理ip每分钟获取一次
+      */
+    @Scheduled(cron="0 0/1 * * * ?")
+    public void getHttpProxy(){
+
+    }
+
 }
