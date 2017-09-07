@@ -28,8 +28,8 @@ public class FetchHouseIndexTimeTask extends TimerTask {
     /**
      * 根据 HouseIndex表,获取新录入的房源信息
      */
-    //@Override
-    //@Scheduled(cron="1 0/1 * * * ?")   //每分钟执行一次
+    @Override
+    @Scheduled(cron="1 0/1 * * * ?")   //每分钟执行一次
     public void run() {
         if(MyHttpClient.available && !houseDetailFetching){
             houseDetailFetching = true;

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.coolcool.sloth.lianjiadb.common.MyHttpClient;
 import com.github.coolcool.sloth.lianjiadb.mapper.HttpProxyMapper;
 import com.github.coolcool.sloth.lianjiadb.model.HttpProxy;
+import com.github.coolcool.sloth.lianjiadb.spider.CheckIPUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,20 +44,17 @@ public class CheckHttpProxyTimeTask extends TimerTask {
             addHttpProxyFromDb();
 
             try {
-                String testurl = "https://gz.lianjia.com/ershoufang/GZ0002179878.html";
+
                 for (int i = 0; i < MyHttpClient.allHttpProxyConfigs.size(); i++) {
                     MyHttpClient.HttpProxyConfig httpProxyConfig = MyHttpClient.allHttpProxyConfigs.get(i);
-                    String result = MyHttpClient.get(testurl,httpProxyConfig);
-                    if("error".equals(result) || (result.indexOf("流量异常")>-1) || (result.indexOf("ERROR")
-                            >-1) || result.indexOf("under a different URI")>-1){
-                        httpProxyConfig.setStatus(0);
-                        log.info("proxyerror:"+ JSONObject.toJSONString(httpProxyConfig));
+                    if(!CheckIPUtils.checkValidIP(httpProxyConfig.getHost(),httpProxyConfig.getPort())){
+                        httpProxyMapper.deleteById(httpProxyConfig.getId());
                         MyHttpClient.removeAvailableHttpProxyConfig(httpProxyConfig);
-                    }else {
+                    }else{
                         httpProxyConfig.setStatus(1);
-                        log.info("proxyok:"+JSONObject.toJSONString(httpProxyConfig));
                         MyHttpClient.addAvailableHttpProxyConfig(httpProxyConfig);
                     }
+
                 }
             }catch (Throwable t){
                 t.printStackTrace();
@@ -84,6 +82,7 @@ public class CheckHttpProxyTimeTask extends TimerTask {
                 MyHttpClient.HttpProxyConfig httpProxyConfig = new MyHttpClient.HttpProxyConfig();
                 httpProxyConfig.setHost(httpProxy.getHost());
                 httpProxyConfig.setPort(httpProxy.getPort());
+                httpProxyConfig.setId(httpProxy.getId());
                 MyHttpClient.allHttpProxyConfigs.add(httpProxyConfig);
                 log.info("load httpProxyConfig from DB : "+JSONObject.toJSONString(httpProxyConfig));
             }

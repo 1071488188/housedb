@@ -18,10 +18,11 @@ import java.util.Date;
 public class HttpProxyTimeTask {
     @Autowired
     private CrawlManager crawlManager;
-    @Scheduled(cron="0 0/1 * * * ?")   //每5分钟执行一次
+    @Scheduled(cron="0 0/5 * * * ?")   //每5分钟执行一次
     public void httpProxy1(){
         Date current = new Date();
         Format format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         crawlManager.proxyIPCrawl();
+        crawlManager.proxyIPCrawl2();
     }
 }

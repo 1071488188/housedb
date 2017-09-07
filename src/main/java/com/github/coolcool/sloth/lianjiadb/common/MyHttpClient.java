@@ -2,12 +2,16 @@ package com.github.coolcool.sloth.lianjiadb.common;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
+import javax.net.ssl.*;
 import java.io.*;
 import java.net.*;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -108,34 +112,57 @@ public abstract class MyHttpClient {
                 proxy = new Proxy(Proxy.Type.SOCKS, addr); // Socket 代理
             else
                 proxy = new Proxy(Proxy.Type.HTTP, addr); // http 代理
-            Authenticator.setDefault(new MyAuthenticator(httpProxyConfig.getUsername(), httpProxyConfig.getPassword()));// 设置代理的用户和密码
+            //Authenticator.setDefault(new MyAuthenticator(httpProxyConfig.getUsername(), httpProxyConfig.getPassword()));// 设置代理的用户和密码
         }
-        HttpURLConnection connection = null;// 设置代理访问
+        HttpURLConnection connection = null;// http设置代理访问
+        HttpsURLConnection httpsURLConnection=null;//https代理
         InputStream is = null;
         try {
             URL tempUrl = new URL(url);
-            if(httpProxyConfig==null || StringUtils.isEmpty(httpProxyConfig.getHost())){
-                connection = (HttpURLConnection) tempUrl.openConnection();
-            }else {
-                connection = (HttpURLConnection) tempUrl.openConnection(proxy);
+            if(!StringUtils.isEmpty(url)&&url.contains("http")&&!url.contains("https")){
+                if(httpProxyConfig==null || StringUtils.isEmpty(httpProxyConfig.getHost())){
+                    connection = (HttpURLConnection) tempUrl.openConnection();
+                }else {
+                    connection = (HttpURLConnection) tempUrl.openConnection(proxy);
+                }
+                connection.setConnectTimeout(60000);
+                connection.setReadTimeout(60000);
+                int status=connection.getResponseCode();
+                if(status==200){
+                    is = connection.getInputStream();
+                    readWeb(sb, is);
+                }else{
+                    return "error";
+                }
+            }else if(!StringUtils.isEmpty(url)&&url.contains("https")){
+                SSLContext sc = SSLContext.getInstance("SSL");
+                sc.init(null, new TrustManager[] { new TrustAnyTrustManager() }, new java.security.SecureRandom());
+
+                if(httpProxyConfig==null || StringUtils.isEmpty(httpProxyConfig.getHost())){
+                    httpsURLConnection = (HttpsURLConnection) tempUrl.openConnection();
+                }else {
+                    httpsURLConnection = (HttpsURLConnection) tempUrl.openConnection(proxy);
+                }
+                httpsURLConnection.setSSLSocketFactory(sc.getSocketFactory());
+                httpsURLConnection.setConnectTimeout(60000);
+                httpsURLConnection.setReadTimeout(60000);
+                httpsURLConnection.setHostnameVerifier(new TrustAnyHostnameVerifier());
+                int status=httpsURLConnection.getResponseCode();
+                if(status==200){
+                    is = httpsURLConnection.getInputStream();
+                    readWeb(sb, is);
+                }else{
+                    return "error";
+                }
+            }else{
+                return "不是正确的url地址";
             }
-            connection.setConnectTimeout(6000);
-            connection.setReadTimeout(6000);
-            is = connection.getInputStream();
-            InputStreamReader isr = new InputStreamReader(is);
-            BufferedReader reader = new BufferedReader(isr);
-            String inputLine  = "";
-            while ((inputLine = reader.readLine())!=null) {
-                sb.append(inputLine).append("\n");
-            }
+
         }catch (FileNotFoundException fe) {
             logger.error("",fe);
-            //return "http_uri_file_not_fount";
-            throw fe;
+          throw fe;
         }catch (Exception e) {
             logger.error("",e);
-            //return "http_connection_error";
-            throw e;
         }finally {
             if(is != null){
                 try {
@@ -148,8 +175,20 @@ public abstract class MyHttpClient {
             if(connection != null){
                 connection.disconnect();
             }
+            if(httpsURLConnection!=null){
+                httpsURLConnection.disconnect();
+            }
         }
         return sb.toString();
+    }
+
+    private static void readWeb(StringBuilder sb, InputStream is) throws IOException {
+        InputStreamReader isr = new InputStreamReader(is);
+        BufferedReader reader = new BufferedReader(isr);
+        String inputLine  = "";
+        while ((inputLine = reader.readLine())!=null) {
+            sb.append(inputLine).append("\n");
+        }
     }
 
 
@@ -176,7 +215,7 @@ public abstract class MyHttpClient {
         String password;
         int status=0; //0:暂停使用；1:使用中
         int type = 0;//0:http proxy; 1:socket proxy
-
+        Integer id;
         public HttpProxyConfig(){
 
         }
@@ -237,6 +276,14 @@ public abstract class MyHttpClient {
         public void setType(int type) {
             this.type = type;
         }
+
+        public Integer getId() {
+            return id;
+        }
+
+        public void setId(Integer id) {
+            this.id = id;
+        }
     }
 
     public static void download(String urlString, String filename) throws Exception {
@@ -262,6 +309,40 @@ public abstract class MyHttpClient {
         // 完毕，关闭所有链接
         os.close();
         is.close();
+    }
+
+    public static void main(String[] args) throws IOException {
+
+        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("1.202.193.60", 9000));
+        String url="http://www.xmy365.com/goods/33085";
+        URL u = new URL(url);
+        URLConnection conn = u.openConnection(proxy);
+        HttpURLConnection httpsCon = (HttpURLConnection) conn;
+        httpsCon.setFollowRedirects(true);
+        String encoding = conn.getContentEncoding();
+        if (StringUtils.isEmpty(encoding)) {
+            encoding = "UTF-8";
+        }
+        InputStream is = conn.getInputStream();
+        String content = IOUtils.toString(is, encoding);
+        System.out.println(content);
+    }
+    private static class TrustAnyTrustManager implements X509TrustManager {
+
+        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        }
+
+        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        }
+
+        public X509Certificate[] getAcceptedIssuers() {
+            return new X509Certificate[] {};
+        }
+    }
+    private static class TrustAnyHostnameVerifier implements HostnameVerifier {
+        public boolean verify(String hostname, SSLSession session) {
+            return true;
+        }
     }
 
 }

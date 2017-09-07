@@ -41,7 +41,7 @@ public abstract class MailUtil {
 
     public static void send(String subject, String content){
 
-        String targetMail = "2394134029@qq.com";    //注意:此处设置接受邮件通知的邮箱地址
+        String targetMail = "****@qq.com";    //注意:此处设置接受邮件通知的邮箱地址
 
         // 设置环境信息
         Session session = Session.getInstance(props);
@@ -54,11 +54,11 @@ public abstract class MailUtil {
             // 设置邮件内容
             msg.setContent(content,"text/html;charset=utf8");
             // 设置发件人
-            msg.setFrom(new InternetAddress("xxxxxxxx@qq.com"));    //注意:此处设置SMTP发件人
+            msg.setFrom(new InternetAddress("*****@qq.com"));    //注意:此处设置SMTP发件人
             msg.setRecipient(Message.RecipientType.TO, new InternetAddress(targetMail));
             transport = session.getTransport();
             // 连接邮件服务器
-            transport.connect("xxxxxxxxx@qq.com", "xxxxxxxxx");     //注意:此处设置SMTP发件服务器的账号、密码
+            transport.connect("*****@qq.com", "*******");     //注意:此处设置SMTP发件服务器的账号、密码
             // 发送邮件
             transport.sendMessage(msg, msg.getAllRecipients());
             transport.close();
@@ -66,7 +66,4 @@ public abstract class MailUtil {
             e.printStackTrace();
         }
     }
-
-
-
 }

@@ -26,8 +26,10 @@ public class ProxyIPPipeline implements Pipeline {
         if (list != null && list.size() > 0) {
             for (HttpProxy proxyIp : list) {
                 if (httpProxyMapper.countByHost(proxyIp.getHost()) < 1) {
+                    if (CheckIPUtils.checkValidIP(proxyIp.getHost(),proxyIp.getPort())) {
+                        httpProxyMapper.save(proxyIp);
+                    }
 
-                    httpProxyMapper.save(proxyIp);
                 }
             }
         }
